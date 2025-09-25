@@ -1,16 +1,36 @@
-# prak_2
+# Задание для практической работы №2
 
-A new Flutter project.
+Необходимо в созданном стартовом проекте внести корректировки в страницу проекта таким образом, чтобы вместо информации о количестве нажатий на клавишу и самой клавиши на экране было написано ФИО, номер группы, а также номер студенческого.
 
-## Getting Started
+# Результат работы:
 
-This project is a starting point for a Flutter application.
+В рамках практической части был изменён исходный код файла main.dart. Из него были удалены:
 
-A few resources to get you started if this is your first Flutter project:
+- Переменная \_counter, отвечающая за подсчёт нажатий.
+- Метод \_incrementCounter(), инкрементирующий счётчик.
+- Виджет FloatingActionButton, так как он более не требовался.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Вместо этого, в теле страницы (внутри Scaffold > body > Center > Column) были добавлены три текстовых элемента Text, отображающие:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- ФИО: Голованев Никита Алексеевич
+- Группа: ИКБО-11-22
+- Студенческий билет: 22И0575
+
+Текст был немного стилизован: ФИО выделено жирным шрифтом и увеличено, между строками добавлены отступы SizedBox.
+
+Ключевая часть изменения::
+
+```dart
+const Text('ФИО: Голованев Никита Алексеевич', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+),
+const SizedBox(height: 20),
+const Text(
+    'Группа: ИКБО-11-22',
+    style: TextStyle(fontSize: 18),
+),
+const SizedBox(height: 10),
+const Text(
+    'Студенческий билет: 22И0575',
+    style: TextStyle(fontSize: 18),
+),
+```
