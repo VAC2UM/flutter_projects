@@ -14,14 +14,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Моя информация'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
   final String title;
 
   @override
@@ -29,6 +28,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,9 +40,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            const Text('Пример текста', style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold, color: Colors.red),
+            const Text('ФИО: Голованев Никита Алексеевич', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const Text('Второй текст', style: TextStyle(fontSize: 20, decoration: TextDecoration.lineThrough),)
+            const SizedBox(height: 20),
+            const Text(
+              'Группа: ИКБО-11-22',
+              style: TextStyle(fontSize: 18),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Студенческий билет: 22И0575',
+              style: TextStyle(fontSize: 18),
+            ),
           ],
         ),
       ),
