@@ -59,6 +59,13 @@ class _MyHomePageState extends State<MyHomePage> {
               'Студенческий билет: 22И0575',
               style: TextStyle(fontSize: 18),
             ),
+          ElevatedButton(
+            style: const ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll<Color>(Colors.green),
+            ),
+            child: const Text('Кнопка'),
+            onPressed: null,
+          ),
           ],
         ),
       ),
