@@ -63,7 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
             style: const ButtonStyle(
               backgroundColor: WidgetStatePropertyAll<Color>(Colors.green),
             ),
-            child: const Text('Кнопка'),
+            child: const Text('Просто кнопка'),
             onPressed: null,
           ),
           ],
