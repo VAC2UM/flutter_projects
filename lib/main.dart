@@ -79,6 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
+
+            Container(
+              margin: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple[50],
+                borderRadius: BorderRadius.circular(100),
+                border: Border.all(color: Colors.deepPurple, width: 3),
+              ),
+              child: const Text(
+                'Информация о студенте',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
+            ),
           ],
         ),
       ),
