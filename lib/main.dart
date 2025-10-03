@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text('ФИО: Голованев Никита Алексеевич',
               style: TextStyle(
@@ -66,6 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
             child: const Text('Просто кнопка'),
             onPressed: null,
           ),
+            const SizedBox(height: 30),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Icon(Icons.home, color: Colors.deepPurple),
+                Icon(Icons.movie, color: Colors.deepPurple),
+                Icon(Icons.cloudy_snowing, color: Colors.deepPurple),
+              ],
+            ),
           ],
         ),
       ),
