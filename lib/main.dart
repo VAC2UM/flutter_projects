@@ -68,13 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
             const SizedBox(height: 30),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Icon(Icons.home, color: Colors.deepPurple),
-                Icon(Icons.movie, color: Colors.deepPurple),
-                Icon(Icons.cloudy_snowing, color: Colors.deepPurple),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 120.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: const [
+                  Icon(Icons.home, color: Colors.deepPurple),
+                  Icon(Icons.movie, color: Colors.deepPurple),
+                  Icon(Icons.cloudy_snowing, color: Colors.deepPurple),
+                ],
+              ),
             ),
           ],
         ),
