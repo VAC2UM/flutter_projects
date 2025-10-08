@@ -15,7 +15,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Настройки')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
@@ -54,7 +54,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _darkTheme = value;
                 });
               },
-            ),            SwitchListTile(
+            ),
+            SwitchListTile(
               title: const Text('Тёмная тема'),
               value: _darkTheme,
               onChanged: (value) {
