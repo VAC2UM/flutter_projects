@@ -29,6 +29,104 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
             SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
+              title: const Text('Тёмная тема'),
+              value: _darkTheme,
+              onChanged: (value) {
+                setState(() {
+                  _darkTheme = value;
+                });
+              },
+            ),
+            SwitchListTile(
               title: const Text('Уведомления'),
               value: _notifications,
               onChanged: (value) {
