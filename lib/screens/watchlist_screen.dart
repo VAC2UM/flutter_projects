@@ -43,7 +43,10 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: _addMovie, child: const Text('Добавить в список')),
+            ElevatedButton(
+              onPressed: _addMovie,
+              child: const Text('Добавить в список'),
+            ),
             const SizedBox(height: 20),
             Expanded(
               child: ListView.builder(

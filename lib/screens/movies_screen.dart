@@ -9,7 +9,7 @@ class MoviesScreen extends StatefulWidget {
 
 class _MoviesScreenState extends State<MoviesScreen> {
   final TextEditingController _movieController = TextEditingController();
-  List<String> _movies = [];
+  final List<String> _movies = [];
 
   void _addMovie() {
     setState(() {
@@ -21,9 +21,9 @@ class _MoviesScreenState extends State<MoviesScreen> {
     });
   }
 
-  void _removeMovie(int index) {
+  void _removeMovie(String movie) {
     setState(() {
-      _movies.removeAt(index);
+      _movies.remove(movie);
     });
   }
 
@@ -48,46 +48,30 @@ class _MoviesScreenState extends State<MoviesScreen> {
                 labelText: 'Введите название фильма',
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _addMovie,
               child: const Text('Добавить фильм'),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             Expanded(
-              child: _movies.isEmpty
-                  ? Center(
-                child: Text(
-                  'Список фильмов пуст',
-                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
-                ),
-              )
-                  : ListView.builder(
-                itemCount: _movies.length,
-                itemBuilder: (context, index) {
-                  final movie = _movies[index];
-                  return GestureDetector(
+              child: ListView(
+                children: _movies.map((movie) {
+                  return Card(
                     key: ValueKey(movie),
-                    onTap: () => _removeMovie(index),
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple[100],
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.deepPurple, width: 2),
+                    child: ListTile(
+                      leading: const Icon(
+                        Icons.movie,
+                        color: Colors.deepPurple,
                       ),
-                      child: Text(
-                        movie,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepPurple,
-                        ),
+                      title: Text(movie, style: const TextStyle(fontSize: 16)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _removeMovie(movie),
                       ),
                     ),
                   );
-                },
+                }).toList(),
               ),
             ),
           ],
