@@ -9,17 +9,21 @@ class MoviesScreen extends StatefulWidget {
 
 class _MoviesScreenState extends State<MoviesScreen> {
   final TextEditingController _movieController = TextEditingController();
-  String? _movieName;
+  List<String> _movies = [];
 
   void _addMovie() {
     setState(() {
       final input = _movieController.text.trim();
-      if (input.isEmpty) {
-        _movieName = null;
-      } else {
-        _movieName = input;
+      if (input.isNotEmpty) {
+        _movies.add(input);
       }
       _movieController.clear();
+    });
+  }
+
+  void _removeMovie(int index) {
+    setState(() {
+      _movies.removeAt(index);
     });
   }
 
@@ -50,23 +54,41 @@ class _MoviesScreenState extends State<MoviesScreen> {
               child: const Text('Добавить фильм'),
             ),
             const SizedBox(height: 30),
-            if (_movieName != null)
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.deepPurple[100],
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.deepPurple, width: 2),
-                ),
+            Expanded(
+              child: _movies.isEmpty
+                  ? Center(
                 child: Text(
-                  _movieName!,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
+                  'Список фильмов пуст',
+                  style: TextStyle(fontSize: 18, color: Colors.grey[600]),
                 ),
+              )
+                  : ListView.builder(
+                itemCount: _movies.length,
+                itemBuilder: (context, index) {
+                  final movie = _movies[index];
+                  return GestureDetector(
+                    onTap: () => _removeMovie(index),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple[100],
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.deepPurple, width: 2),
+                      ),
+                      child: Text(
+                        movie,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
+            ),
           ],
         ),
       ),
