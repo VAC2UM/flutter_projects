@@ -67,6 +67,7 @@ class _MoviesScreenState extends State<MoviesScreen> {
                 itemBuilder: (context, index) {
                   final movie = _movies[index];
                   return GestureDetector(
+                    key: ValueKey(movie),
                     onTap: () => _removeMovie(index),
                     child: Container(
                       margin: const EdgeInsets.symmetric(vertical: 8),
