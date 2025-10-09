@@ -37,50 +37,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Профиль')),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              const Text(
+      body: ListView.builder(
+        padding: const EdgeInsets.all(20.0),
+        itemCount: 7,
+        itemBuilder: (context, index) {
+          switch (index) {
+            case 0:
+              return const Text(
                 'ФИО: Голованев Никита Алексеевич',
                 style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              const Text(
+              );
+            case 1:
+              return const SizedBox(height: 10);
+            case 2:
+              return const Text(
                 'Группа: ИКБО-11-22',
                 style: TextStyle(fontSize: 18, color: Colors.blue),
-              ),
-              const SizedBox(height: 10),
-              const Text(
+              );
+            case 3:
+              return const SizedBox(height: 10);
+            case 4:
+              return const Text(
                 'Студенческий билет: 22И0575',
                 style: TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: _ageController,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Введите ваш возраст',
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _showAge,
-                child: const Text('Показать возраст'),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                _message,
-                style: const TextStyle(fontSize: 18, color: Colors.deepPurple),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+              );
+            case 5:
+              return const SizedBox(height: 30);
+            case 6:
+              return Column(
+                children: [
+                  TextField(
+                    controller: _ageController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Введите ваш возраст',
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _showAge,
+                    child: const Text('Показать возраст'),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    _message,
+                    style: const TextStyle(fontSize: 18, color: Colors.deepPurple),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              );
+            default:
+              return const SizedBox.shrink();
+          }
+        },
       ),
     );
   }
