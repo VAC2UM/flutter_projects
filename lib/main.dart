@@ -59,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Актеры'),
           BottomNavigationBarItem(icon: Icon(Icons.movie), label: 'Фильмы'),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Избранное'),
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Желаемое'),

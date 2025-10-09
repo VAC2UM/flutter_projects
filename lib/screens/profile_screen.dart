@@ -8,86 +8,88 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final TextEditingController _ageController = TextEditingController();
-  String _message = "Введите ваш возраст и нажмите кнопку";
+  final TextEditingController _controller = TextEditingController();
+  final List<String> _favoriteActors = [];
 
-  void _showAge() {
+  void _addActor() {
+    final actor = _controller.text.trim();
+    if (actor.isNotEmpty) {
+      setState(() {
+        _favoriteActors.add(actor);
+      });
+      _controller.clear();
+    }
+  }
+
+  void _removeActor(int index) {
     setState(() {
-      final input = _ageController.text;
-      if (input.isEmpty) {
-        _message = "Вы не ввели возраст!";
-      } else {
-        final age = int.tryParse(input);
-        if (age == null || age < 0) {
-          _message = "Введите корректное число!";
-        } else {
-          _message = "Ваш возраст: $age лет";
-        }
-      }
+      _favoriteActors.removeAt(index);
     });
   }
 
   @override
   void dispose() {
-    _ageController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileItems = const [
-      'ФИО: Голованев Никита Алексеевич',
-      'Группа: ИКБО-11-22',
-      'Студенческий билет: 22И0575',
-    ];
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Профиль')),
-      body: ListView.separated(
+      appBar: AppBar(title: const Text('Любимые актёры')),
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
-        itemCount: profileItems.length + 1,
-        separatorBuilder: (context, index) {
-          if (index < profileItems.length - 1) {
-            return const Divider(height: 24, thickness: 1);
-          }
-          return const Divider(height: 32);
-        },
-        itemBuilder: (context, index) {
-          if (index < profileItems.length) {
-            final text = profileItems[index];
-            final style = index == 0
-                ? const TextStyle(fontSize: 19, fontWeight: FontWeight.bold)
-                : index == 1
-                ? const TextStyle(fontSize: 18, color: Colors.blue)
-                : const TextStyle(fontSize: 18);
-            return Text(text, style: style);
-          } else {
-            return Column(
-              children: [
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _ageController,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Введите ваш возраст',
-                  ),
+        child: Column(
+          children: [
+            TextField(
+              controller: _controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Введите имя актёра',
+              ),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: _addActor,
+              child: const Text('Добавить актёра'),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: _favoriteActors.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final actor = entry.value;
+                    return Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue[100],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              actor,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _removeActor(index),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _showAge,
-                  child: const Text('Показать возраст'),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  _message,
-                  style: const TextStyle(fontSize: 18, color: Colors.deepPurple),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            );
-          }
-        },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
