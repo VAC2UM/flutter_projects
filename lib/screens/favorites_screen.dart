@@ -43,19 +43,38 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ),
             ),
             const SizedBox(height: 10),
-            ElevatedButton(onPressed: _addFavorite, child: const Text('Добавить')),
+            ElevatedButton(
+              onPressed: _addFavorite,
+              child: const Text('Добавить в избранное'),
+            ),
             const SizedBox(height: 20),
             Expanded(
-              child: ListView.builder(
+              child: ListView.separated(
                 itemCount: _favorites.length,
+                separatorBuilder: (context, index) =>
+                    const Divider(color: Colors.grey, height: 1),
                 itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(_favorites[index]),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _removeFavorite(index),
-                      ),
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.orange[50],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.favorite, color: Colors.red),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            _favorites[index],
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _removeFavorite(index),
+                        ),
+                      ],
                     ),
                   );
                 },
