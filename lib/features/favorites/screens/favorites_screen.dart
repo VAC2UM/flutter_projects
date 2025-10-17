@@ -22,6 +22,24 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   void _addFavorite() {
     final movie = _controller.text.trim();
     if (movie.isNotEmpty) {
+      final favorites = FavoritesContainer.of(context).favorites;
+      if (favorites.length >= 4) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Лимит достигнут'),
+            content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Ок'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
       FavoritesContainer.of(context).addFavorite(movie);
       _controller.clear();
       setState(() {});
