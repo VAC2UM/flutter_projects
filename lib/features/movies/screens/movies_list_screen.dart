@@ -33,6 +33,9 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final container = MoviesContainer.of(context);
+    final movies = container.movies;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Фильмы')),
       body: Padding(
@@ -50,9 +53,9 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
             StatefulBuilder(
               builder: (context, setState) {
                 return RatingSlider(
-                  value: MoviesContainer.of(context).selectedRating,
+                  value: container.selectedRating,
                   onChanged: (rating) {
-                    MoviesContainer.of(context).setRating(rating);
+                    container.setRating(rating);
                     setState(() {});
                   },
                 );
@@ -65,28 +68,27 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: StatefulBuilder(
-                builder: (context, setState) {
-                  final movies = MoviesContainer.of(context).movies;
-
-                  if (movies.isEmpty) {
-                    return const EmptyState(
-                      icon: Icons.movie,
-                      title: 'Нет фильмов',
-                      subtitle: 'Добавьте свой первый фильм с рейтингом',
-                    );
-                  }
-
-                  return ListView(
-                    children: movies.map((movie) {
-                      return MovieTile(
-                        movie: movie,
-                        onDelete: () {
-                          MoviesContainer.of(context).removeMovie(movie);
-                          setState(() {});
-                        },
+              child: movies.isEmpty
+                  ? const EmptyState(
+                icon: Icons.movie,
+                title: 'Нет фильмов',
+                subtitle: 'Добавьте свой первый фильм с рейтингом',
+              )
+                  : ListView.separated(
+                itemCount: movies.length,
+                separatorBuilder: (_, __) =>
+                const Divider(color: Colors.grey, height: 1),
+                itemBuilder: (context, index) {
+                  final movie = movies[index];
+                  return MovieTile(
+                    movie: movie,
+                    onDelete: () {
+                      container.deleteMovie(
+                        context,
+                        movie,
+                            () => setState(() {}),
                       );
-                    }).toList(),
+                    },
                   );
                 },
               ),

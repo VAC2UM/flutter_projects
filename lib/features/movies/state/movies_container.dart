@@ -27,9 +27,38 @@ class _MoviesContainerState extends State<MoviesContainer> {
     });
   }
 
-  void removeMovie(Movie movie) {
+  /// Удаление фильма с возможностью отмены
+  void deleteMovie(BuildContext context, Movie movie, VoidCallback onUpdated) {
+    final index = _movies.indexOf(movie);
+    if (index == -1) return;
+
+    // Сохраняем удалённый фильм
+    final removedMovie = _movies[index];
+
     setState(() {
-      _movies.remove(movie);
+      _movies.removeAt(index);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Удалён фильм: ${removedMovie.title}'),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () {
+            _restoreMovie(removedMovie, index);
+            onUpdated();
+          },
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+
+    onUpdated();
+  }
+
+  void _restoreMovie(Movie movie, int index) {
+    setState(() {
+      _movies.insert(index, movie);
     });
   }
 
