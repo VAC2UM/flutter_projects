@@ -24,12 +24,15 @@ class _ActorsScreenState extends State<ActorsScreen> {
     if (actor.isNotEmpty) {
       ActorsContainer.of(context).addActor(actor);
       _controller.clear();
-      setState(() {});
+      setState(() {}); // Обновляем экран
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final container = ActorsContainer.of(context);
+    final actors = container.favoriteActors;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Любимые актёры')),
       body: Padding(
@@ -50,34 +53,29 @@ class _ActorsScreenState extends State<ActorsScreen> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: StatefulBuilder(
-                builder: (context, setState) {
-                  final actors = ActorsContainer.of(context).favoriteActors;
-
-                  if (actors.isEmpty) {
-                    return const EmptyState(
-                      icon: Icons.person,
-                      title: 'Нет любимых актёров',
-                      subtitle: 'Добавьте актёров в список',
-                    );
-                  }
-
-                  return SingleChildScrollView(
-                    child: Column(
-                      children: actors.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final actor = entry.value;
-                        return ActorTile(
-                          actor: actor,
-                          onDelete: () {
-                            ActorsContainer.of(context).removeActor(index);
-                            setState(() {});
-                          },
+              child: actors.isEmpty
+                  ? const EmptyState(
+                icon: Icons.person,
+                title: 'Нет любимых актёров',
+                subtitle: 'Добавьте актёров в список',
+              )
+                  : SingleChildScrollView(
+                child: Column(
+                  children: actors.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final actor = entry.value;
+                    return ActorTile(
+                      actor: actor,
+                      onDelete: () {
+                        container.deleteActor(
+                          context,
+                          actor.id,
+                              () => setState(() {}),
                         );
-                      }).toList(),
-                    ),
-                  );
-                },
+                      },
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ],

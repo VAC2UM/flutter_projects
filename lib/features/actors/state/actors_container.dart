@@ -25,9 +25,37 @@ class _ActorsContainerState extends State<ActorsContainer> {
     });
   }
 
-  void removeActor(int index) {
+  void deleteActor(BuildContext context, String id, VoidCallback onUpdated) {
+    final index = _favoriteActors.indexWhere((actor) => actor.id == id);
+    if (index == -1) return;
+
+    final removedActor = _favoriteActors[index];
     setState(() {
       _favoriteActors.removeAt(index);
+    });
+
+    // Показываем SnackBar с Undo
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Удалён актёр: ${removedActor.name}'),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () {
+            _restoreActor(removedActor, index);
+            onUpdated(); // 🔹 Обновляем экран сразу после Undo
+          },
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+
+    // 🔹 После удаления тоже обновляем экран
+    onUpdated();
+  }
+
+  void _restoreActor(Actor actor, int index) {
+    setState(() {
+      _favoriteActors.insert(index, actor);
     });
   }
 
