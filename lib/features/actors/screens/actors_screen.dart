@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../state/profile_container.dart';
+import '../state/actors_container.dart';
 import '../widgets/actor_tile.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class ActorsScreen extends StatefulWidget {
+  const ActorsScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ActorsScreen> createState() => _ActorsScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ActorsScreenState extends State<ActorsScreen> {
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -22,7 +22,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _addActor() {
     final actor = _controller.text.trim();
     if (actor.isNotEmpty) {
-      ProfileContainer.of(context).addActor(actor);
+      ActorsContainer.of(context).addActor(actor);
       _controller.clear();
       setState(() {});
     }
@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Expanded(
               child: StatefulBuilder(
                 builder: (context, setState) {
-                  final actors = ProfileContainer.of(context).favoriteActors;
+                  final actors = ActorsContainer.of(context).favoriteActors;
 
                   if (actors.isEmpty) {
                     return const EmptyState(
@@ -70,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return ActorTile(
                           actor: actor,
                           onDelete: () {
-                            ProfileContainer.of(context).removeActor(index);
+                            ActorsContainer.of(context).removeActor(index);
                             setState(() {});
                           },
                         );

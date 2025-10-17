@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_projects/features/actors/actors_feature.dart';
+import 'package:flutter_projects/features/actors/state/actors_container.dart';
 import 'shared/app_theme.dart';
 import 'features/movies/movies_feature.dart';
 import 'features/watchlist/watchlist_feature.dart';
 import 'features/favorites/favorites_feature.dart';
-import 'features/profile/profile_feature.dart';
 import 'features/settings/settings_feature.dart';
 
 class MyApp extends StatelessWidget {
@@ -34,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _getScreen(int index) {
     switch (index) {
       case 0:
-        return const ProfileContainer(child: ProfileScreen());
+        return const ActorsContainer(child: ActorsScreen());
       case 1:
         return const MoviesContainer(child: MoviesListScreen());
       case 2:
@@ -44,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 4:
         return const SettingsScreen();
       default:
-        return const ProfileContainer(child: ProfileScreen());
+        return const ActorsContainer(child: ActorsScreen());
     }
   }
 

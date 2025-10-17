@@ -2,10 +2,10 @@
 export 'models/actor.dart';
 
 // State
-export 'state/profile_container.dart';
+export 'state/actors_container.dart';
 
 // Screens
-export 'screens/profile_screen.dart';
+export 'screens/actors_screen.dart';
 
 // Widgets
 export 'widgets/actor_tile.dart';

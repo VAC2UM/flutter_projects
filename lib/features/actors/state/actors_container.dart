@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import '../models/actor.dart';
 
-class ProfileContainer extends StatefulWidget {
+class ActorsContainer extends StatefulWidget {
   final Widget child;
 
-  const ProfileContainer({super.key, required this.child});
+  const ActorsContainer({super.key, required this.child});
 
   @override
-  State<ProfileContainer> createState() => _ProfileContainerState();
+  State<ActorsContainer> createState() => _ActorsContainerState();
 
-  static _ProfileContainerState of(BuildContext context) {
-    return context.findAncestorStateOfType<_ProfileContainerState>()!;
+  static _ActorsContainerState of(BuildContext context) {
+    return context.findAncestorStateOfType<_ActorsContainerState>()!;
   }
 }
 
-class _ProfileContainerState extends State<ProfileContainer> {
+class _ActorsContainerState extends State<ActorsContainer> {
   final List<Actor> _favoriteActors = [];
 
   List<Actor> get favoriteActors => List.unmodifiable(_favoriteActors);
