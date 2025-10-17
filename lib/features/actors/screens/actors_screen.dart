@@ -24,7 +24,7 @@ class _ActorsScreenState extends State<ActorsScreen> {
     if (actor.isNotEmpty) {
       ActorsContainer.of(context).addActor(actor);
       _controller.clear();
-      setState(() {}); // Обновляем экран
+      setState(() {});
     }
   }
 

@@ -20,34 +20,39 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void _addFavorite() {
-    final movie = _controller.text.trim();
-    if (movie.isNotEmpty) {
-      final favorites = FavoritesContainer.of(context).favorites;
-      if (favorites.length >= 4) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Лимит достигнут'),
-            content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Ок'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
+    final title = _controller.text.trim();
+    if (title.isEmpty) return;
 
-      FavoritesContainer.of(context).addFavorite(movie);
-      _controller.clear();
-      setState(() {});
+    final container = FavoritesContainer.of(context);
+    final favorites = container.favorites;
+
+    if (favorites.length >= 4) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Лимит достигнут'),
+          content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Ок'),
+            ),
+          ],
+        ),
+      );
+      return;
     }
+
+    container.addFavorite(title);
+    _controller.clear();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final container = FavoritesContainer.of(context);
+    final favorites = container.favorites;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Избранное')),
       body: Padding(
@@ -68,30 +73,25 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: StatefulBuilder(
-                builder: (context, setState) {
-                  final favorites = FavoritesContainer.of(context).favorites;
-
-                  if (favorites.isEmpty) {
-                    return const EmptyState(
-                      icon: Icons.favorite,
-                      title: 'Нет избранных фильмов',
-                      subtitle: 'Добавьте фильмы в избранное',
-                    );
-                  }
-
-                  return ListView.separated(
-                    itemCount: favorites.length,
-                    separatorBuilder: (context, index) =>
-                        const Divider(color: Colors.grey, height: 1),
-                    itemBuilder: (context, index) {
-                      final favorite = favorites[index];
-                      return FavoriteTile(
-                        favorite: favorite,
-                        onDelete: () {
-                          FavoritesContainer.of(context).removeFavorite(index);
-                          setState(() {});
-                        },
+              child: favorites.isEmpty
+                  ? const EmptyState(
+                icon: Icons.favorite,
+                title: 'Нет избранных фильмов',
+                subtitle: 'Добавьте фильмы в избранное',
+              )
+                  : ListView.separated(
+                itemCount: favorites.length,
+                separatorBuilder: (context, _) =>
+                const Divider(color: Colors.grey, height: 1),
+                itemBuilder: (context, index) {
+                  final favorite = favorites[index];
+                  return FavoriteTile(
+                    favorite: favorite,
+                    onDelete: () {
+                      container.deleteFavorite(
+                        context,
+                        favorite.id,
+                            () => setState(() {}),
                       );
                     },
                   );

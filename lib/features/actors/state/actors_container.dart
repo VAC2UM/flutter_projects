@@ -34,7 +34,6 @@ class _ActorsContainerState extends State<ActorsContainer> {
       _favoriteActors.removeAt(index);
     });
 
-    // Показываем SnackBar с Undo
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Удалён актёр: ${removedActor.name}'),
@@ -42,14 +41,13 @@ class _ActorsContainerState extends State<ActorsContainer> {
           label: 'Отменить',
           onPressed: () {
             _restoreActor(removedActor, index);
-            onUpdated(); // 🔹 Обновляем экран сразу после Undo
+            onUpdated();
           },
         ),
         duration: const Duration(seconds: 3),
       ),
     );
 
-    // 🔹 После удаления тоже обновляем экран
     onUpdated();
   }
 

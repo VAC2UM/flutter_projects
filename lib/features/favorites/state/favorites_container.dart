@@ -25,9 +25,35 @@ class _FavoritesContainerState extends State<FavoritesContainer> {
     });
   }
 
-  void removeFavorite(int index) {
+  void deleteFavorite(BuildContext context, String id, VoidCallback onUpdated) {
+    final index = _favorites.indexWhere((fav) => fav.id == id);
+    if (index == -1) return;
+
+    final removed = _favorites[index];
     setState(() {
       _favorites.removeAt(index);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Удалён из избранного: ${removed.title}'),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () {
+            _restoreFavorite(removed, index);
+            onUpdated();
+          },
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+
+    onUpdated();
+  }
+
+  void _restoreFavorite(Favorite favorite, int index) {
+    setState(() {
+      _favorites.insert(index, favorite);
     });
   }
 
