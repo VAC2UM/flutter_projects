@@ -19,9 +19,9 @@ class _FavoritesContainerState extends State<FavoritesContainer> {
 
   List<Favorite> get favorites => List.unmodifiable(_favorites);
 
-  void addFavorite(String title) {
+  void addFavorite({required String title, String? imageUrl}) {
     setState(() {
-      _favorites.add(Favorite.create(title: title));
+      _favorites.add(Favorite.create(title: title, imageUrl: imageUrl));
     });
   }
 

@@ -1,18 +1,22 @@
 class Favorite {
   final String id;
   final String title;
+  final String? imageUrl;
 
-  Favorite({required this.id, required this.title});
+  Favorite({required this.id, required this.title, this.imageUrl});
 
-  Favorite.create({required this.title})
-    : id = DateTime.now().millisecondsSinceEpoch.toString();
+  Favorite.create({required this.title, this.imageUrl})
+      : id = DateTime.now().millisecondsSinceEpoch.toString();
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is Favorite && other.id == id && other.title == title;
+    return other is Favorite &&
+        other.id == id &&
+        other.title == title &&
+        other.imageUrl == imageUrl;
   }
 
   @override
-  int get hashCode => id.hashCode ^ title.hashCode;
+  int get hashCode => id.hashCode ^ title.hashCode ^ imageUrl.hashCode;
 }

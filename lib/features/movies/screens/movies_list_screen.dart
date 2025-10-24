@@ -63,10 +63,8 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Форма добавления фильма
             _buildAddMovieForm(),
             const SizedBox(height: 20),
-            // Список фильмов
             Expanded(
               child: movies.isEmpty
                   ? const EmptyState(

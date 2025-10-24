@@ -19,10 +19,8 @@ class MovieTile extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              // Постер фильма
               _buildMoviePoster(),
               const SizedBox(width: 16),
-              // Информация о фильме
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +48,6 @@ class MovieTile extends StatelessWidget {
                   ],
                 ),
               ),
-              // Кнопка удаления
               IconButton(
                 icon: Container(
                   padding: const EdgeInsets.all(8),
