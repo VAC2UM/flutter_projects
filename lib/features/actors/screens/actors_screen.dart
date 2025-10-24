@@ -11,19 +11,27 @@ class ActorsScreen extends StatefulWidget {
 }
 
 class _ActorsScreenState extends State<ActorsScreen> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
   void _addActor() {
-    final actor = _controller.text.trim();
-    if (actor.isNotEmpty) {
-      ActorsContainer.of(context).addActor(actor);
-      _controller.clear();
+    final name = _nameController.text.trim();
+    final imageUrl = _imageUrlController.text.trim();
+
+    if (name.isNotEmpty) {
+      ActorsContainer.of(context).addActor(
+        name: name,
+        imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+      );
+      _nameController.clear();
+      _imageUrlController.clear();
       setState(() {});
     }
   }
@@ -34,23 +42,16 @@ class _ActorsScreenState extends State<ActorsScreen> {
     final actors = container.favoriteActors;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Любимые актёры')),
+      appBar: AppBar(
+        title: const Text('Любимые актёры'),
+        backgroundColor: Colors.blue[700],
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            TextField(
-              controller: _controller,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Введите имя актёра',
-              ),
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _addActor,
-              child: const Text('Добавить актёра'),
-            ),
+            _buildAddActorForm(),
             const SizedBox(height: 20),
             Expanded(
               child: actors.isEmpty
@@ -59,28 +60,62 @@ class _ActorsScreenState extends State<ActorsScreen> {
                 title: 'Нет любимых актёров',
                 subtitle: 'Добавьте актёров в список',
               )
-                  : SingleChildScrollView(
-                child: Column(
-                  children: actors.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final actor = entry.value;
-                    return ActorTile(
-                      actor: actor,
-                      onDelete: () {
-                        container.deleteActor(
-                          context,
-                          actor.id,
-                              () => setState(() {}),
-                        );
-                      },
-                    );
-                  }).toList(),
-                ),
+                  : ListView.separated(
+                itemCount: actors.length,
+                separatorBuilder: (context, index) =>
+                const SizedBox(height: 8),
+                itemBuilder: (context, index) {
+                  final actor = actors[index];
+                  return ActorTile(
+                    actor: actor,
+                    onDelete: () {
+                      container.deleteActor(
+                        context,
+                        actor.id,
+                            () => setState(() {}),
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAddActorForm() {
+    return Column(
+      children: [
+        TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Имя актёра',
+            prefixIcon: Icon(Icons.person),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _imageUrlController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'URL фото (опционально)',
+            prefixIcon: Icon(Icons.image),
+          ),
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: _addActor,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue[700],
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          child: const Text('Добавить актёра'),
+        ),
+      ],
     );
   }
 }

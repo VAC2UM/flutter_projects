@@ -19,9 +19,9 @@ class _ActorsContainerState extends State<ActorsContainer> {
 
   List<Actor> get favoriteActors => List.unmodifiable(_favoriteActors);
 
-  void addActor(String name) {
+  void addActor({required String name, String? imageUrl}) {
     setState(() {
-      _favoriteActors.add(Actor.create(name: name));
+      _favoriteActors.add(Actor.create(name: name, imageUrl: imageUrl));
     });
   }
 
