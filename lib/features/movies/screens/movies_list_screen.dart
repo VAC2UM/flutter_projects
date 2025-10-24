@@ -13,22 +13,39 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   final TextEditingController _movieController = TextEditingController();
+  final TextEditingController _imageUrlController = TextEditingController();
+  int _currentRating = 5;
 
   @override
   void dispose() {
     _movieController.dispose();
+    _imageUrlController.dispose();
     super.dispose();
   }
 
   void _addMovie() {
     final title = _movieController.text.trim();
+    final imageUrl = _imageUrlController.text.trim();
+
     if (title.isNotEmpty) {
       final container = MoviesContainer.of(context);
-      container.addMovie(title, container.selectedRating);
+      container.addMovie(
+        title: title,
+        rating: _currentRating,
+        imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+      );
       _movieController.clear();
-      container.setRating(5);
-      setState(() {});
+      _imageUrlController.clear();
+      setState(() {
+        _currentRating = 5;
+      });
     }
+  }
+
+  void _updateRating(int rating) {
+    setState(() {
+      _currentRating = rating;
+    });
   }
 
   @override
@@ -37,36 +54,19 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
     final movies = container.movies;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Фильмы')),
+      appBar: AppBar(
+        title: const Text('Фильмы'),
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            TextField(
-              controller: _movieController,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Введите название фильма',
-              ),
-            ),
+            // Форма добавления фильма
+            _buildAddMovieForm(),
             const SizedBox(height: 20),
-            StatefulBuilder(
-              builder: (context, setState) {
-                return RatingSlider(
-                  value: container.selectedRating,
-                  onChanged: (rating) {
-                    container.setRating(rating);
-                    setState(() {});
-                  },
-                );
-              },
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: _addMovie,
-              child: const Text('Добавить фильм'),
-            ),
-            const SizedBox(height: 20),
+            // Список фильмов
             Expanded(
               child: movies.isEmpty
                   ? const EmptyState(
@@ -76,8 +76,7 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
               )
                   : ListView.separated(
                 itemCount: movies.length,
-                separatorBuilder: (_, __) =>
-                const Divider(color: Colors.grey, height: 1),
+                separatorBuilder: (_, __) => const SizedBox(height: 4),
                 itemBuilder: (context, index) {
                   final movie = movies[index];
                   return MovieTile(
@@ -96,6 +95,45 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildAddMovieForm() {
+    return Column(
+      children: [
+        TextField(
+          controller: _movieController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'Название фильма',
+            prefixIcon: Icon(Icons.movie),
+          ),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _imageUrlController,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: 'URL постера (опционально)',
+            prefixIcon: Icon(Icons.image),
+          ),
+        ),
+        const SizedBox(height: 20),
+        RatingSlider(
+          value: _currentRating,
+          onChanged: _updateRating,
+        ),
+        const SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: _addMovie,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          child: const Text('Добавить фильм'),
+        ),
+      ],
     );
   }
 }

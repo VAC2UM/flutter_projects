@@ -21,18 +21,16 @@ class _MoviesContainerState extends State<MoviesContainer> {
   List<Movie> get movies => List.unmodifiable(_movies);
   int get selectedRating => _selectedRating;
 
-  void addMovie(String title, int rating) {
+  void addMovie({required String title, required int rating, String? imageUrl}) {
     setState(() {
-      _movies.add(Movie.create(title: title, rating: rating));
+      _movies.add(Movie.create(title: title, rating: rating, imageUrl: imageUrl));
     });
   }
 
-  /// Удаление фильма с возможностью отмены
   void deleteMovie(BuildContext context, Movie movie, VoidCallback onUpdated) {
     final index = _movies.indexOf(movie);
     if (index == -1) return;
 
-    // Сохраняем удалённый фильм
     final removedMovie = _movies[index];
 
     setState(() {
