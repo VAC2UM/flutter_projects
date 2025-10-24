@@ -19,9 +19,13 @@ class _WatchlistContainerState extends State<WatchlistContainer> {
 
   List<WatchlistItem> get watchlist => List.unmodifiable(_watchlist);
 
-  void addMovie(String title) {
+  void addMovie({required String title, String? imageUrl}) {
     setState(() {
-      _watchlist.add(WatchlistItem.create(title: title, watched: false));
+      _watchlist.add(WatchlistItem.create(
+        title: title,
+        watched: false,
+        imageUrl: imageUrl,
+      ));
     });
   }
 
