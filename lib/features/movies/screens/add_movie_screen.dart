@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/rating_slider.dart';
 
 class AddMovieScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
   void _saveMovie() {
     final title = _movieController.text.trim();
     if (title.isNotEmpty) {
-      Navigator.pop(context, {
+      context.pop({
         'title': title,
         'rating': _currentRating,
         'imageUrl': _imageUrlController.text.trim(),
@@ -64,7 +65,7 @@ class _AddMovieScreenState extends State<AddMovieScreen> {
         title: const Text('Добавить фильм'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,

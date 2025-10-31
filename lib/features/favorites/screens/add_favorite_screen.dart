@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddFavoriteScreen extends StatefulWidget {
   const AddFavoriteScreen({super.key});
@@ -21,7 +22,7 @@ class _AddFavoriteScreenState extends State<AddFavoriteScreen> {
   void _saveFavorite() {
     final title = _titleController.text.trim();
     if (title.isNotEmpty) {
-      Navigator.pop(context, {
+      context.pop({
         'title': title,
         'imageUrl': _imageUrlController.text.trim(),
       });
@@ -42,7 +43,7 @@ class _AddFavoriteScreenState extends State<AddFavoriteScreen> {
         title: const Text('Добавить в избранное'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(), // Используем context.pop()
         ),
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,

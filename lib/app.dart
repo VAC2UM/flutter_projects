@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_projects/features/actors/screens/add_actor_screen.dart';
+import 'package:flutter_projects/features/movies/screens/add_movie_screen.dart';
 import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
+import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
+import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/actors/actors_feature.dart';
 import 'package:flutter_projects/features/actors/state/actors_container.dart';
@@ -70,6 +73,63 @@ final GoRouter _router = GoRouter(
         return CustomTransitionPage(
           key: state.pageKey,
           child: const AddActorScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/movies/add',
+      name: 'addMovie',
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: const AddMovieScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/favorites/add',
+      name: 'addFavorite',
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: const AddFavoriteScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/watchlist/add',
+      name: 'addWatchlist',
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: const AddWatchlistScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return SlideTransition(
               position: Tween<Offset>(

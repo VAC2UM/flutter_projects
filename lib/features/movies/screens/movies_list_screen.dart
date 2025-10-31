@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/movies_container.dart';
 import '../widgets/movie_tile.dart';
-import 'add_movie_screen.dart';
 
 class MoviesListScreen extends StatefulWidget {
   const MoviesListScreen({super.key});
@@ -15,12 +14,7 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   void _openAddMovieForm() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AddMovieScreen(),
-      ),
-    );
+    final result = await context.push('/movies/add');
 
     if (result != null && result is Map<String, dynamic>) {
       _addMovieFromForm(result);
@@ -38,6 +32,14 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
       director: movieData['director'].isEmpty ? null : movieData['director'],
       year: movieData['year'].isEmpty ? null : int.tryParse(movieData['year']),
       genre: movieData['genre'].isEmpty ? null : movieData['genre'],
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Фильм "${movieData['title']}" добавлен'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
     );
 
     setState(() {});
@@ -83,7 +85,6 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
           );
         },
       ),
-      // Кнопка + для вертикальной навигации
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddMovieForm,
         backgroundColor: Colors.deepPurple,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/favorites_container.dart';
 import '../widgets/favorite_tile.dart';
-import 'add_favorite_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -19,12 +19,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       return;
     }
 
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AddFavoriteScreen(),
-      ),
-    );
+    final result = await context.push('/favorites/add');
 
     if (result != null && result is Map<String, dynamic>) {
       _addFavoriteFromForm(result);
@@ -39,7 +34,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       imageUrl: favoriteData['imageUrl'].isEmpty ? null : favoriteData['imageUrl'],
     );
 
-    // Показываем уведомление об успешном добавлении
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('"${favoriteData['title']}" добавлен в избранное'),
@@ -59,7 +53,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => context.pop(),
             child: const Text('Ок'),
           ),
         ],

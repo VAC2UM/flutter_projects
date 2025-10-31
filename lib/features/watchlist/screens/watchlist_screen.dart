@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/watchlist_container.dart';
 import '../widgets/watchlist_item_tile.dart';
-import 'add_watchlist_screen.dart';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -13,12 +13,7 @@ class WatchlistScreen extends StatefulWidget {
 
 class _WatchlistScreenState extends State<WatchlistScreen> {
   void _openAddMovieForm() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AddWatchlistScreen(),
-      ),
-    );
+    final result = await context.push('/watchlist/add');
 
     if (result != null && result is Map<String, dynamic>) {
       _addMovieFromForm(result);
