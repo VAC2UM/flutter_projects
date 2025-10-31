@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/watchlist_container.dart';
 import '../widgets/watchlist_item_tile.dart';
+import 'add_watchlist_screen.dart';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -11,142 +12,110 @@ class WatchlistScreen extends StatefulWidget {
 }
 
 class _WatchlistScreenState extends State<WatchlistScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  void _openAddMovieForm() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddWatchlistScreen(),
+      ),
+    );
 
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _imageUrlController.dispose();
-    super.dispose();
+    if (result != null && result is Map<String, dynamic>) {
+      _addMovieFromForm(result);
+    }
   }
 
-  void _addMovie() {
-    final title = _titleController.text.trim();
-    final imageUrl = _imageUrlController.text.trim();
+  void _addMovieFromForm(Map<String, dynamic> movieData) {
+    final container = WatchlistContainer.of(context);
 
-    if (title.isNotEmpty) {
-      WatchlistContainer.of(context).addMovie(
-        title: title,
-        imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
-      );
-      _titleController.clear();
-      _imageUrlController.clear();
-      setState(() {});
-    }
+    container.addMovie(
+      title: movieData['title'],
+      imageUrl: movieData['imageUrl'].isEmpty ? null : movieData['imageUrl'],
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('"${movieData['title']}" добавлен в список'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final container = WatchlistContainer.of(context);
+    final watchlist = container.watchlist;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Желаемое'),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            _buildAddMovieForm(),
-            const SizedBox(height: 20),
-            _buildStatistics(),
-            const SizedBox(height: 20),
-            Expanded(
-              child: StatefulBuilder(
-                builder: (context, setState) {
-                  final watchlist = WatchlistContainer.of(context).watchlist;
-
-                  if (watchlist.isEmpty) {
-                    return const EmptyState(
-                      icon: Icons.list,
-                      title: 'Список пуст',
-                      subtitle: 'Добавьте фильмы, которые хотите посмотреть',
-                    );
-                  }
-
-                  return ListView.separated(
-                    itemCount: watchlist.length,
-                    separatorBuilder: (context, _) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final item = watchlist[index];
-                      return WatchlistItemTile(
-                        item: item,
-                        onChanged: (_) {
-                          WatchlistContainer.of(context).toggleWatched(index);
-                          setState(() {});
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+      body: Column(
+        children: [
+          _buildStatistics(),
+          const SizedBox(height: 20),
+          Expanded(
+            child: watchlist.isEmpty
+                ? const EmptyState(
+              icon: Icons.list,
+              title: 'Список пуст',
+              subtitle: 'Добавьте фильмы, которые хотите посмотреть',
+            )
+                : ListView.separated(
+              padding: const EdgeInsets.all(20.0),
+              itemCount: watchlist.length,
+              separatorBuilder: (context, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final item = watchlist[index];
+                return WatchlistItemTile(
+                  item: item,
+                  onChanged: (_) {
+                    container.toggleWatched(index);
+                    setState(() {});
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddMovieForm,
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildAddMovieForm() {
-    return Column(
-      children: [
-        TextField(
-          controller: _titleController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Название фильма',
-            prefixIcon: Icon(Icons.movie),
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _imageUrlController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'URL постера (опционально)',
-            prefixIcon: Icon(Icons.image),
-          ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: _addMovie,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 50),
-          ),
-          child: const Text('Добавить в список'),
-        ),
-      ],
-    );
-  }
-
   Widget _buildStatistics() {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        final watchlist = WatchlistContainer.of(context).watchlist;
-        final total = watchlist.length;
-        final watched = watchlist.where((item) => item.watched).length;
-        final remaining = total - watched;
+    final watchlist = WatchlistContainer.of(context).watchlist;
+    final total = watchlist.length;
+    final watched = watchlist.where((item) => item.watched).length;
+    final remaining = total - watched;
 
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.green[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.green[200]!),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem('Всего', total.toString(), Icons.movie),
-              _buildStatItem('Просмотрено', watched.toString(), Icons.check_circle),
-              _buildStatItem('Осталось', remaining.toString(), Icons.schedule),
-            ],
-          ),
-        );
-      },
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.green[200]!),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildStatItem('Всего', total.toString(), Icons.movie),
+          _buildStatItem('Просмотрено', watched.toString(), Icons.check_circle),
+          _buildStatItem('Осталось', remaining.toString(), Icons.schedule),
+        ],
+      ),
     );
   }
 
