@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddActorScreen extends StatefulWidget {
   const AddActorScreen({super.key});
@@ -21,7 +22,7 @@ class _AddActorScreenState extends State<AddActorScreen> {
   void _saveActor() {
     final name = _nameController.text.trim();
     if (name.isNotEmpty) {
-      Navigator.pop(context, {
+      context.pop({
         'name': name,
         'imageUrl': _imageUrlController.text.trim(),
       });
@@ -42,7 +43,7 @@ class _AddActorScreenState extends State<AddActorScreen> {
         title: const Text('Добавить актера'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
         ),
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,

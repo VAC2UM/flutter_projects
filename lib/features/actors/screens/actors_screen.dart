@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/actors_container.dart';
 import '../widgets/actor_tile.dart';
-import 'add_actor_screen.dart';
 
 class ActorsScreen extends StatefulWidget {
   const ActorsScreen({super.key});
@@ -13,12 +13,7 @@ class ActorsScreen extends StatefulWidget {
 
 class _ActorsScreenState extends State<ActorsScreen> {
   void _openAddActorForm() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AddActorScreen(),
-      ),
-    );
+    final result = await context.push('/actors/add');
 
     if (result != null && result is Map<String, dynamic>) {
       _addActorFromForm(result);
@@ -79,7 +74,6 @@ class _ActorsScreenState extends State<ActorsScreen> {
           );
         },
       ),
-      // Кнопка + для вертикальной навигации
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddActorForm,
         backgroundColor: Colors.blue[700],
