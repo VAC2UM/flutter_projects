@@ -4,62 +4,78 @@ import '../models/movie.dart';
 
 class MovieTile extends StatelessWidget {
   final Movie movie;
+  final VoidCallback? onTap;
   final VoidCallback? onDelete;
 
-  const MovieTile({super.key, required this.movie, this.onDelete});
+  const MovieTile({super.key, required this.movie, this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              _buildMoviePoster(),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      movie.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8),
+        child: Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                _buildMoviePoster(),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        movie.title,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    _buildRatingStars(),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Рейтинг: ${movie.rating}/10',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                      const SizedBox(height: 8),
+                      _buildRatingStars(),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Рейтинг: ${movie.rating}/10',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
-                    shape: BoxShape.circle,
+                      if (movie.director != null || movie.year != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          '${movie.director ?? ''} ${movie.year != null ? '(${movie.year})' : ''}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ],
                   ),
-                  child: const Icon(Icons.delete, color: Colors.red, size: 20),
                 ),
-                onPressed: onDelete,
-              ),
-            ],
+                IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.delete, color: Colors.red, size: 20),
+                  ),
+                  onPressed: onDelete,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -67,7 +83,7 @@ class MovieTile extends StatelessWidget {
   }
 
   Widget _buildMoviePoster() {
-    final defaultImageUrl = movie.imageUrl ?? 'https://avatars.mds.yandex.net/i?id=2834d31489c7357b9f67b9489064ecafb1fd8a03-12601053-images-thumbs&n=13';
+    final defaultImageUrl = movie.imageUrl ?? 'https://via.placeholder.com/70x100/6c757d/ffffff?text=No+Image';
 
     return Container(
       width: 70,
@@ -112,9 +128,9 @@ class MovieTile extends StatelessWidget {
   }
 
   Widget _buildRatingStars() {
+    final starRating = (movie.rating / 2).round();
     return Row(
       children: List.generate(5, (index) {
-        final starRating = (movie.rating / 2).round();
         return Icon(
           index < starRating ? Icons.star : Icons.star_border,
           color: Colors.amber,

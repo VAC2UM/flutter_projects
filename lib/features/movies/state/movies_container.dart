@@ -16,14 +16,28 @@ class MoviesContainer extends StatefulWidget {
 
 class _MoviesContainerState extends State<MoviesContainer> {
   final List<Movie> _movies = [];
-  int _selectedRating = 5;
 
   List<Movie> get movies => List.unmodifiable(_movies);
-  int get selectedRating => _selectedRating;
 
-  void addMovie({required String title, required int rating, String? imageUrl}) {
+  void addMovie({
+    required String title,
+    required int rating,
+    String? imageUrl,
+    String? description,
+    String? director,
+    int? year,
+    String? genre,
+  }) {
     setState(() {
-      _movies.add(Movie.create(title: title, rating: rating, imageUrl: imageUrl));
+      _movies.add(Movie.create(
+        title: title,
+        rating: rating,
+        imageUrl: imageUrl,
+        description: description,
+        director: director,
+        year: year,
+        genre: genre,
+      ));
     });
   }
 
@@ -57,12 +71,6 @@ class _MoviesContainerState extends State<MoviesContainer> {
   void _restoreMovie(Movie movie, int index) {
     setState(() {
       _movies.insert(index, movie);
-    });
-  }
-
-  void setRating(int rating) {
-    setState(() {
-      _selectedRating = rating;
     });
   }
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/actors/actors_feature.dart';
 import 'package:flutter_projects/features/actors/state/actors_container.dart';
@@ -37,6 +38,28 @@ final GoRouter _router = GoRouter(
           pageBuilder: (context, state) => const NoTransitionPage(
             child: MoviesContainer(child: MoviesListScreen()),
           ),
+          routes: [
+            GoRoute(
+              path: 'details',
+              name: 'movieDetails',
+              pageBuilder: (context, state) {
+                final movie = state.extra as Movie;
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: MovieDetailsScreen(movie: movie),
+                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(1.0, 0.0),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    );
+                  },
+                );
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/favorites',
