@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/actors_container.dart';
 import '../widgets/actor_tile.dart';
+import 'add_actor_screen.dart';
 
 class ActorsScreen extends StatefulWidget {
   const ActorsScreen({super.key});
@@ -11,29 +12,36 @@ class ActorsScreen extends StatefulWidget {
 }
 
 class _ActorsScreenState extends State<ActorsScreen> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  void _openAddActorForm() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddActorScreen(),
+      ),
+    );
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _imageUrlController.dispose();
-    super.dispose();
+    if (result != null && result is Map<String, dynamic>) {
+      _addActorFromForm(result);
+    }
   }
 
-  void _addActor() {
-    final name = _nameController.text.trim();
-    final imageUrl = _imageUrlController.text.trim();
+  void _addActorFromForm(Map<String, dynamic> actorData) {
+    final container = ActorsContainer.of(context);
 
-    if (name.isNotEmpty) {
-      ActorsContainer.of(context).addActor(
-        name: name,
-        imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
-      );
-      _nameController.clear();
-      _imageUrlController.clear();
-      setState(() {});
-    }
+    container.addActor(
+      name: actorData['name'],
+      imageUrl: actorData['imageUrl'].isEmpty ? null : actorData['imageUrl'],
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Актер "${actorData['name']}" добавлен'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
+    setState(() {});
   }
 
   @override
@@ -47,75 +55,37 @@ class _ActorsScreenState extends State<ActorsScreen> {
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: actors.isEmpty
+          ? const EmptyState(
+        icon: Icons.person,
+        title: 'Нет любимых актёров',
+        subtitle: 'Добавьте актёров в список',
+      )
+          : ListView.separated(
         padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            _buildAddActorForm(),
-            const SizedBox(height: 20),
-            Expanded(
-              child: actors.isEmpty
-                  ? const EmptyState(
-                icon: Icons.person,
-                title: 'Нет любимых актёров',
-                subtitle: 'Добавьте актёров в список',
-              )
-                  : ListView.separated(
-                itemCount: actors.length,
-                separatorBuilder: (context, index) =>
-                const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final actor = actors[index];
-                  return ActorTile(
-                    actor: actor,
-                    onDelete: () {
-                      container.deleteActor(
-                        context,
-                        actor.id,
-                            () => setState(() {}),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+        itemCount: actors.length,
+        separatorBuilder: (context, index) => const SizedBox(height: 8),
+        itemBuilder: (context, index) {
+          final actor = actors[index];
+          return ActorTile(
+            actor: actor,
+            onDelete: () {
+              container.deleteActor(
+                context,
+                actor.id,
+                    () => setState(() {}),
+              );
+            },
+          );
+        },
       ),
-    );
-  }
-
-  Widget _buildAddActorForm() {
-    return Column(
-      children: [
-        TextField(
-          controller: _nameController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Имя актёра',
-            prefixIcon: Icon(Icons.person),
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _imageUrlController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'URL фото (опционально)',
-            prefixIcon: Icon(Icons.image),
-          ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: _addActor,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue[700],
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 50),
-          ),
-          child: const Text('Добавить актёра'),
-        ),
-      ],
+      // Кнопка + для вертикальной навигации
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddActorForm,
+        backgroundColor: Colors.blue[700],
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
