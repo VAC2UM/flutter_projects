@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../state/favorites_container.dart';
 import '../widgets/favorite_tile.dart';
+import 'add_favorite_screen.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -11,49 +12,59 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
-
-  @override
-  void dispose() {
-    _titleController.dispose();
-    _imageUrlController.dispose();
-    super.dispose();
-  }
-
-  void _addFavorite() {
-    final title = _titleController.text.trim();
-    final imageUrl = _imageUrlController.text.trim();
-
-    if (title.isEmpty) return;
-
+  void _openAddFavoriteForm() async {
     final container = FavoritesContainer.of(context);
-    final favorites = container.favorites;
-
-    if (favorites.length >= 4) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Лимит достигнут'),
-          content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Ок'),
-            ),
-          ],
-        ),
-      );
+    if (container.favorites.length >= 4) {
+      _showLimitDialog();
       return;
     }
 
-    container.addFavorite(
-      title: title,
-      imageUrl: imageUrl.isNotEmpty ? imageUrl : null,
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddFavoriteScreen(),
+      ),
     );
-    _titleController.clear();
-    _imageUrlController.clear();
+
+    if (result != null && result is Map<String, dynamic>) {
+      _addFavoriteFromForm(result);
+    }
+  }
+
+  void _addFavoriteFromForm(Map<String, dynamic> favoriteData) {
+    final container = FavoritesContainer.of(context);
+
+    container.addFavorite(
+      title: favoriteData['title'],
+      imageUrl: favoriteData['imageUrl'].isEmpty ? null : favoriteData['imageUrl'],
+    );
+
+    // Показываем уведомление об успешном добавлении
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('"${favoriteData['title']}" добавлен в избранное'),
+        backgroundColor: Colors.green,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+
     setState(() {});
+  }
+
+  void _showLimitDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Лимит достигнут'),
+        content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ок'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -67,84 +78,51 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            // Форма добавления в избранное
-            _buildAddFavoriteForm(),
-            const SizedBox(height: 20),
-            // Счетчик избранных фильмов
-            _buildFavoritesCounter(favorites.length),
-            const SizedBox(height: 20),
-            // Список избранных
-            Expanded(
-              child: favorites.isEmpty
-                  ? const EmptyState(
-                icon: Icons.favorite_border,
-                title: 'Нет избранных фильмов',
-                subtitle: 'Добавьте фильмы в избранное',
-              )
-                  : ListView.separated(
-                itemCount: favorites.length,
-                separatorBuilder: (context, _) => const SizedBox(height: 8),
-                itemBuilder: (context, index) {
-                  final favorite = favorites[index];
-                  return FavoriteTile(
-                    favorite: favorite,
-                    onDelete: () {
-                      container.deleteFavorite(
-                        context,
-                        favorite.id,
-                            () => setState(() {}),
-                      );
-                    },
-                  );
-                },
-              ),
+      body: Column(
+        children: [
+          _buildFavoritesCounter(favorites.length),
+          const SizedBox(height: 20),
+          Expanded(
+            child: favorites.isEmpty
+                ? const EmptyState(
+              icon: Icons.favorite_border,
+              title: 'Нет избранных фильмов',
+              subtitle: 'Добавьте фильмы в избранное',
+            )
+                : ListView.separated(
+              padding: const EdgeInsets.all(20.0),
+              itemCount: favorites.length,
+              separatorBuilder: (context, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final favorite = favorites[index];
+                return FavoriteTile(
+                  favorite: favorite,
+                  onDelete: () {
+                    container.deleteFavorite(
+                      context,
+                      favorite.id,
+                          () => setState(() {}),
+                    );
+                  },
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildAddFavoriteForm() {
-    return Column(
-      children: [
-        TextField(
-          controller: _titleController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'Название фильма',
-            prefixIcon: Icon(Icons.movie),
-          ),
-        ),
-        const SizedBox(height: 12),
-        TextField(
-          controller: _imageUrlController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            labelText: 'URL постера (опционально)',
-            prefixIcon: Icon(Icons.image),
-          ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: _addFavorite,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepOrange,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 50),
-          ),
-          child: const Text('Добавить в избранное'),
-        ),
-      ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openAddFavoriteForm,
+        backgroundColor: Colors.deepOrange,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   Widget _buildFavoritesCounter(int count) {
     return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.orange[50],
