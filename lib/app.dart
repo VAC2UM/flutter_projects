@@ -108,19 +108,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        context.go('/actors');
+        context.pushReplacement('/actors');
         break;
       case 1:
-        context.go('/movies');
+        context.pushReplacement('/movies');
         break;
       case 2:
-        context.go('/favorites');
+        context.pushReplacement('/favorites');
         break;
       case 3:
-        context.go('/watchlist');
+        context.pushReplacement('/watchlist');
         break;
       case 4:
-        context.go('/settings');
+        context.pushReplacement('/settings');
         break;
     }
   }
