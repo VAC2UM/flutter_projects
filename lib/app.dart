@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_projects/features/actors/screens/add_actor_screen.dart';
 import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/actors/actors_feature.dart';
@@ -38,28 +39,6 @@ final GoRouter _router = GoRouter(
           pageBuilder: (context, state) => const NoTransitionPage(
             child: MoviesContainer(child: MoviesListScreen()),
           ),
-          routes: [
-            GoRoute(
-              path: 'details',
-              name: 'movieDetails',
-              pageBuilder: (context, state) {
-                final movie = state.extra as Movie;
-                return CustomTransitionPage(
-                  key: state.pageKey,
-                  child: MovieDetailsScreen(movie: movie),
-                  transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                    return SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    );
-                  },
-                );
-              },
-            ),
-          ],
         ),
         GoRoute(
           path: '/favorites',
@@ -83,6 +62,45 @@ final GoRouter _router = GoRouter(
           ),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/actors/add',
+      name: 'addActor',
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: const AddActorScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.0, 1.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/movies/details',
+      name: 'movieDetails',
+      pageBuilder: (context, state) {
+        final movie = state.extra as Movie;
+        return CustomTransitionPage(
+          key: state.pageKey,
+          child: MovieDetailsScreen(movie: movie),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        );
+      },
     ),
   ],
 );
@@ -128,26 +146,6 @@ class _MyHomePageState extends State<MyHomePage> {
     return 0;
   }
 
-  void _onItemTapped(int index, BuildContext context) {
-    switch (index) {
-      case 0:
-        context.pushReplacement('/actors');
-        break;
-      case 1:
-        context.pushReplacement('/movies');
-        break;
-      case 2:
-        context.pushReplacement('/favorites');
-        break;
-      case 3:
-        context.pushReplacement('/watchlist');
-        break;
-      case 4:
-        context.pushReplacement('/settings');
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -156,7 +154,25 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: _getCurrentIndex(context),
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-        onTap: (index) => _onItemTapped(index, context),
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              context.go('/actors');
+              break;
+            case 1:
+              context.go('/movies');
+              break;
+            case 2:
+              context.go('/favorites');
+              break;
+            case 3:
+              context.go('/watchlist');
+              break;
+            case 4:
+              context.go('/settings');
+              break;
+          }
+        },
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Актеры'),
