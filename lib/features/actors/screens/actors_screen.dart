@@ -1,84 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_projects/features/actors/actors_feature.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../state/actors_container.dart';
 import '../widgets/actor_tile.dart';
 
 class ActorsScreen extends StatefulWidget {
-  const ActorsScreen({super.key});
+  final List<Actor> actors;
+
+  const ActorsScreen({super.key, required this.actors});
 
   @override
   State<ActorsScreen> createState() => _ActorsScreenState();
 }
 
 class _ActorsScreenState extends State<ActorsScreen> {
-  void _openAddActorForm() async {
-    final result = await context.push('/actors/add');
-
-    if (result != null && result is Map<String, dynamic>) {
-      _addActorFromForm(result);
-    }
-  }
-
-  void _addActorFromForm(Map<String, dynamic> actorData) {
-    final container = ActorsContainer.of(context);
-
-    container.addActor(
-      name: actorData['name'],
-      imageUrl: actorData['imageUrl'].isEmpty ? null : actorData['imageUrl'],
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Актер "${actorData['name']}" добавлен'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    final container = ActorsContainer.of(context);
-    final actors = container.favoriteActors;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Любимые актёры'),
+        title: const Text('Актёры'),
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop()
+        ),
       ),
-      body: actors.isEmpty
+      body: widget.actors.isEmpty
           ? const EmptyState(
         icon: Icons.person,
-        title: 'Нет любимых актёров',
-        subtitle: 'Добавьте актёров в список',
+        title: 'Список актеров пуст',
+        subtitle: 'Необходимо добавить актеров',
       )
           : ListView.separated(
         padding: const EdgeInsets.all(20.0),
-        itemCount: actors.length,
+        itemCount: widget.actors.length,
         separatorBuilder: (context, index) => const SizedBox(height: 8),
         itemBuilder: (context, index) {
-          final actor = actors[index];
-          return ActorTile(
-            actor: actor,
-            onDelete: () {
-              container.deleteActor(
-                context,
-                actor.id,
-                    () => setState(() {}),
-              );
-            },
-          );
+          final actor = widget.actors[index];
+          return ActorTile(actor: actor);
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _openAddActorForm,
-        backgroundColor: Colors.blue[700],
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
       ),
     );
   }

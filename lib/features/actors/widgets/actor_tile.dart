@@ -52,17 +52,6 @@ class ActorTile extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.delete, color: Colors.red, size: 20),
-            ),
-            onPressed: onDelete,
-          ),
         ],
       ),
     );

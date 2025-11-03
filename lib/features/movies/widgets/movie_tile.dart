@@ -5,9 +5,8 @@ import '../models/movie.dart';
 class MovieTile extends StatelessWidget {
   final Movie movie;
   final VoidCallback? onTap;
-  final VoidCallback? onDelete;
 
-  const MovieTile({super.key, required this.movie, this.onTap, this.onDelete});
+  const MovieTile({super.key, required this.movie, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -62,17 +61,6 @@ class MovieTile extends StatelessWidget {
                       ],
                     ],
                   ),
-                ),
-                IconButton(
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.delete, color: Colors.red, size: 20),
-                  ),
-                  onPressed: onDelete,
                 ),
               ],
             ),

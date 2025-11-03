@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import '../../../shared/widgets/empty_state.dart';
-import '../state/favorites_container.dart';
-import '../widgets/favorite_tile.dart';
+import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
+import 'package:flutter_projects/shared/widgets/empty_state.dart';
+import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
+import 'package:flutter_projects/features/favorites/widgets/favorite_tile.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -19,7 +19,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       return;
     }
 
-    final result = await context.push('/favorites/add');
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => const AddFavoriteScreen()),
+    );
 
     if (result != null && result is Map<String, dynamic>) {
       _addFavoriteFromForm(result);
@@ -53,7 +55,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
         actions: [
           TextButton(
-            onPressed: () => context.pop(),
+            onPressed: () => Navigator.of(context).pop(),
             child: const Text('Ок'),
           ),
         ],
@@ -71,6 +73,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         title: const Text('Избранное'),
         backgroundColor: Colors.deepOrange,
         foregroundColor: Colors.white,
+        leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop()
+        ),
       ),
       body: Column(
         children: [
