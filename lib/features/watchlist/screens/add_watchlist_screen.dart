@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AddWatchlistScreen extends StatefulWidget {
   const AddWatchlistScreen({super.key});
@@ -21,7 +22,7 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
   void _saveMovie() {
     final title = _titleController.text.trim();
     if (title.isNotEmpty) {
-      Navigator.of(context).pop({
+      context.pop({
         'title': title,
         'imageUrl': _imageUrlController.text.trim(),
       });
@@ -42,7 +43,7 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
         title: const Text('Добавить в список'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,

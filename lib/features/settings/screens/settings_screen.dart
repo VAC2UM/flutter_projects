@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,7 +14,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _notifications = true;
   final String _imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Windows_Settings_app_icon.png';
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +23,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         foregroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop()
+          onPressed: () => context.pop(),
         ),
       ),
       body: SingleChildScrollView(

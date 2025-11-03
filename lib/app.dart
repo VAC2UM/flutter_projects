@@ -1,17 +1,121 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_projects/features/movies/models/movie.dart';
+import 'package:flutter_projects/shared/data/data_source.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/auth/screens/auth_screen.dart';
+import 'package:flutter_projects/features/main/screens/main_menu_screen.dart';
+import 'package:flutter_projects/features/actors/screens/actors_screen.dart';
+import 'package:flutter_projects/features/movies/screens/movies_list_screen.dart';
+import 'package:flutter_projects/features/favorites/screens/favorites_screen.dart';
+import 'package:flutter_projects/features/watchlist/screens/watchlist_screen.dart';
+import 'package:flutter_projects/features/settings/settings_feature.dart';
+import 'package:flutter_projects/features/actors/state/actors_container.dart';
+import 'package:flutter_projects/features/movies/state/movies_container.dart';
+import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
+import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
+import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
+import 'package:flutter_projects/features/actors/screens/add_actor_screen.dart';
+import 'package:flutter_projects/features/movies/screens/add_movie_screen.dart';
+import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
+import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
 import 'shared/app_theme.dart';
+
+final GoRouter _router = GoRouter(
+  initialLocation: '/auth',
+  routes: [
+    GoRoute(
+      path: '/auth',
+      name: 'auth',
+      builder: (context, state) => const AuthScreen(),
+    ),
+
+    GoRoute(
+      path: '/main',
+      name: 'main',
+      builder: (context, state) => const MainMenuScreen(),
+    ),
+
+    GoRoute(
+      path: '/actors',
+      name: 'actors',
+      builder: (context, state) => ActorsContainer(
+        child: ActorsScreen(actors: AppData.actors),
+      ),
+    ),
+    GoRoute(
+      path: '/actors/add',
+      name: 'addActor',
+      builder: (context, state) => const AddActorScreen(),
+    ),
+
+    GoRoute(
+      path: '/movies',
+      name: 'movies',
+      builder: (context, state) => MoviesContainer(
+        child: MoviesListScreen(movies: AppData.movies),
+      ),
+    ),
+    GoRoute(
+      path: '/movies/add',
+      name: 'addMovie',
+      builder: (context, state) => const AddMovieScreen(),
+    ),
+    GoRoute(
+      path: '/movies/details',
+      name: 'movieDetails',
+      builder: (context, state) {
+        final movie = state.extra as Movie;
+        return MovieDetailsScreen(movie: movie);
+      },
+    ),
+
+    // Favorites Section
+    GoRoute(
+      path: '/favorites',
+      name: 'favorites',
+      builder: (context, state) => const FavoritesContainer(
+        child: FavoritesScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/favorites/add',
+      name: 'addFavorite',
+      builder: (context, state) => const AddFavoriteScreen(),
+    ),
+
+    // Watchlist Section
+    GoRoute(
+      path: '/watchlist',
+      name: 'watchlist',
+      builder: (context, state) => const WatchlistContainer(
+        child: WatchlistScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/watchlist/add',
+      name: 'addWatchlist',
+      builder: (context, state) => const AddWatchlistScreen(),
+    ),
+
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      builder: (context, state) => const SettingsScreen(),
+    ),
+  ],
+);
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'Фильмотека',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      home: const AuthScreen(),
+      routerConfig: _router,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

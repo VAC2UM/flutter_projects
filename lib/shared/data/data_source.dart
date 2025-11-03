@@ -29,9 +29,4 @@ class AppData {
       genre: 'Драма',
     ),
   ];
-
-  static final List<WatchlistItem> watchlist = [
-    WatchlistItem(id: '1', title: 'Дюна', watched: false, imageUrl: 'https://example.com/dune.jpg'),
-    WatchlistItem(id: '2', title: 'Оппенгеймер', watched: true, imageUrl: 'https://example.com/oppenheimer.jpg'),
-  ];
 }

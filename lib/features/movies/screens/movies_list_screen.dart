@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/movies/widgets/movie_tile.dart';
 import 'package:flutter_projects/shared/widgets/empty_state.dart';
-import 'movie_details_screen.dart';
 
 class MoviesListScreen extends StatefulWidget {
   final List<Movie> movies;
@@ -15,11 +15,7 @@ class MoviesListScreen extends StatefulWidget {
 
 class _MoviesListScreenState extends State<MoviesListScreen> {
   void _navigateToMovieDetails(Movie movie) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => MovieDetailsScreen(movie: movie),
-      ),
-    );
+    context.push('/movies/details', extra: movie);
   }
 
   @override
@@ -30,8 +26,8 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop()
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
         ),
       ),
       body: widget.movies.isEmpty

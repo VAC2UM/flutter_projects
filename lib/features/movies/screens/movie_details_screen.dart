@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/movie.dart';
 
@@ -14,7 +15,7 @@ class MovieDetailsScreen extends StatelessWidget {
         title: const Text('Детали фильма'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(), // Вертикальная навигация назад
+          onPressed: () => context.pop(),
         ),
       ),
       body: SingleChildScrollView(
@@ -22,7 +23,6 @@ class MovieDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Постер фильма
             _buildMoviePoster(),
             const SizedBox(height: 20),
 
@@ -46,7 +46,7 @@ class MovieDetailsScreen extends StatelessWidget {
             const SizedBox(height: 30),
             Center(
               child: ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(), // Вертикальная навигация назад
+                onPressed: () => context.pop(),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,

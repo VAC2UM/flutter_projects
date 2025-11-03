@@ -1,27 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_projects/features/auth/screens/auth_screen.dart';
-import 'package:flutter_projects/features/favorites/favorites_feature.dart';
-import 'package:flutter_projects/features/movies/movies_feature.dart';
-import 'package:flutter_projects/features/watchlist/screens/watchlist_screen.dart';
-import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
-import 'package:flutter_projects/shared/data/data_source.dart';
-import '../../actors/actors_feature.dart';
-import '../../actors/state/actors_container.dart';
-import '../../settings/settings_feature.dart';
+import 'package:flutter_projects/features/auth/state/auth_state.dart';
+import 'package:go_router/go_router.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
 
-  void _navigateToScreen(BuildContext context, Widget screen) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => screen),
-    );
-  }
-
   void _logout(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const AuthScreen()),
-    );
+    AuthState.logout();
+    context.pushReplacement('/auth');
   }
 
   @override
@@ -62,8 +48,7 @@ class MainMenuScreen extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 30),
-
+            const SizedBox(height: 20),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -75,58 +60,35 @@ class MainMenuScreen extends StatelessWidget {
                     'Актеры',
                     Icons.person,
                     Colors.blue,
-                        () => _navigateToScreen(
-                      context,
-                      ActorsContainer(
-                        child: ActorsScreen(actors: AppData.actors),
-                      ),
-                    ),
+                        () => context.push('/actors'),
                   ),
                   _buildMenuButton(
                     context,
                     'Фильмы',
                     Icons.movie,
                     Colors.deepPurple,
-                        () => _navigateToScreen(
-                      context,
-                      MoviesContainer(
-                        child: MoviesListScreen(movies: AppData.movies),
-                      ),
-                    ),
+                        () => context.push('/movies'),
                   ),
                   _buildMenuButton(
                     context,
                     'Избранное',
                     Icons.favorite,
                     Colors.deepOrange,
-                        () => _navigateToScreen(
-                      context,
-                      FavoritesContainer(
-                        child: FavoritesScreen(),
-                      ),
-                    ),
+                        () => context.push('/favorites'),
                   ),
                   _buildMenuButton(
                     context,
                     'Желаемое',
                     Icons.list,
                     Colors.green,
-                        () => _navigateToScreen(
-                      context,
-                      WatchlistContainer(
-                        child: WatchlistScreen(),
-                      ),
-                    ),
+                        () => context.push('/watchlist'),
                   ),
                   _buildMenuButton(
                     context,
                     'Настройки',
                     Icons.settings,
                     Colors.black,
-                        () => _navigateToScreen(
-                      context,
-                      const SettingsScreen(),
-                    ),
+                        () => context.push('/settings'),
                   ),
                 ],
               ),

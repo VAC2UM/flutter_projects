@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/shared/widgets/empty_state.dart';
 import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
 import 'package:flutter_projects/features/watchlist/widgets/watchlist_item_tile.dart';
@@ -13,9 +13,7 @@ class WatchlistScreen extends StatefulWidget {
 
 class _WatchlistScreenState extends State<WatchlistScreen> {
   void _openAddMovieForm() async {
-    final result = await Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const AddWatchlistScreen()),
-    );
+    final result = await context.push('/watchlist/add');
 
     if (result != null && result is Map<String, dynamic>) {
       _addMovieFromForm(result);
@@ -52,8 +50,8 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop()
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
         ),
       ),
       body: Column(

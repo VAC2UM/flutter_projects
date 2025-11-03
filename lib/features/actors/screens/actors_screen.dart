@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/actors/actors_feature.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../widgets/actor_tile.dart';
@@ -21,8 +22,8 @@ class _ActorsScreenState extends State<ActorsScreen> {
         backgroundColor: Colors.blue[700],
         foregroundColor: Colors.white,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop()
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
         ),
       ),
       body: widget.actors.isEmpty

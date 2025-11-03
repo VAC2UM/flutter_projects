@@ -1,13 +1,48 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_projects/features/main/screens/main_menu_screen.dart';
+import 'package:go_router/go_router.dart';
+import '../state/auth_state.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   void _login(BuildContext context) {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const MainMenuScreen()),
-    );
+    final login = _loginController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (login == 'admin' && password == '12345') {
+      AuthState.login(login);
+      context.pushReplacement('/main');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Неверный логин или пароль'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _checkAuthStatus() {
+    if (AuthState.isAuthenticated) {
+      print('Пользователь уже авторизован: ${AuthState.currentUser}');
+    } else {
+      print('Пользователь не авторизован');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthStatus();
   }
 
   @override
@@ -52,23 +87,39 @@ class AuthScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  const TextField(
-                    decoration: InputDecoration(
+
+                  TextField(
+                    controller: _loginController,
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Логин',
                       prefixIcon: Icon(Icons.person),
+                      hintText: 'Введите admin',
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const TextField(
+                  TextField(
+                    controller: _passwordController,
                     obscureText: true,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Пароль',
                       prefixIcon: Icon(Icons.lock),
+                      hintText: 'Введите 12345',
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
+
+                  const Text(
+                    'Для теста: admin / 12345',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
