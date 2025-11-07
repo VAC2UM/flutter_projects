@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/shared/widgets/empty_state.dart';
 import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
 import 'package:flutter_projects/features/favorites/widgets/favorite_tile.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -37,7 +38,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('"${favoriteData['title']}" добавлен в избранное'),
-        backgroundColor: Colors.green,
+        backgroundColor: ThemeState.of(context).currentTheme.colorScheme.primary,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -46,6 +47,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   void _showLimitDialog() {
+    final themeState = ThemeState.of(context);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -54,7 +57,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         actions: [
           TextButton(
             onPressed: () => context.pop(),
-            child: const Text('Ок'),
+            child: Text(
+              'Ок',
+              style: TextStyle(
+                color: themeState.currentTheme.colorScheme.primary,
+              ),
+            ),
           ),
         ],
       ),
@@ -63,14 +71,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
     final container = FavoritesContainer.of(context);
     final favorites = container.favorites;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Избранное'),
-        backgroundColor: Colors.deepOrange,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -78,14 +87,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       body: Column(
         children: [
-          _buildFavoritesCounter(favorites.length),
+          _buildFavoritesCounter(favorites.length, themeState),
           const SizedBox(height: 20),
           Expanded(
             child: favorites.isEmpty
-                ? const EmptyState(
+                ? EmptyState(
               icon: Icons.favorite_border,
               title: 'Нет избранных фильмов',
               subtitle: 'Добавьте фильмы в избранное',
+              themeState: themeState,
             )
                 : ListView.separated(
               padding: const EdgeInsets.all(20.0),
@@ -110,22 +120,22 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddFavoriteForm,
-        backgroundColor: Colors.deepOrange,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildFavoritesCounter(int count) {
+  Widget _buildFavoritesCounter(int count, ThemeState themeState) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.orange[50],
+        color: themeState.currentTheme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.orange[200]!),
+        border: Border.all(color: themeState.currentTheme.colorScheme.outline.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -135,19 +145,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
-              color: Colors.orange[800],
+              color: themeState.currentTheme.colorScheme.onPrimaryContainer,
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.deepOrange,
+              color: themeState.currentTheme.colorScheme.primary,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
               '$count/4',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: themeState.currentTheme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
               ),

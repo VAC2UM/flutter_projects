@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/movies/widgets/movie_tile.dart';
 import 'package:flutter_projects/shared/widgets/empty_state.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class MoviesListScreen extends StatefulWidget {
   final List<Movie> movies;
@@ -20,21 +21,24 @@ class _MoviesListScreenState extends State<MoviesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Фильмы'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
       ),
       body: widget.movies.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
         icon: Icons.movie,
         title: 'Нет фильмов',
         subtitle: 'Список фильмов пуст',
+        themeState: themeState,
       )
           : ListView.separated(
         padding: const EdgeInsets.all(20.0),

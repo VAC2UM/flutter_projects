@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class AddWatchlistScreen extends StatefulWidget {
   const AddWatchlistScreen({super.key});
@@ -28,9 +29,9 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Введите название фильма'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text('Введите название фильма'),
+          backgroundColor: ThemeState.of(context).currentTheme.colorScheme.error,
         ),
       );
     }
@@ -38,6 +39,8 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Добавить в список'),
@@ -45,8 +48,8 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -55,20 +58,26 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
             children: [
               TextField(
                 controller: _titleController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
                   labelText: 'Название фильма *',
-                  prefixIcon: Icon(Icons.movie),
+                  prefixIcon: Icon(
+                      Icons.movie,
+                      color: themeState.currentTheme.colorScheme.primary
+                  ),
                   hintText: 'Введите название фильма',
                 ),
               ),
               const SizedBox(height: 20),
               TextField(
                 controller: _imageUrlController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
                   labelText: 'URL постера (опционально)',
-                  prefixIcon: Icon(Icons.image),
+                  prefixIcon: Icon(
+                      Icons.image,
+                      color: themeState.currentTheme.colorScheme.primary
+                  ),
                   hintText: 'https://example.com/poster.jpg',
                 ),
               ),
@@ -76,8 +85,8 @@ class _AddWatchlistScreenState extends State<AddWatchlistScreen> {
               ElevatedButton(
                 onPressed: _saveMovie,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+                  backgroundColor: themeState.currentTheme.colorScheme.primary,
+                  foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
                   minimumSize: const Size(double.infinity, 50),
                 ),
                 child: const Text('Добавить в список'),

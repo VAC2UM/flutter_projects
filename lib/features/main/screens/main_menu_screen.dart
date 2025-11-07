@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_projects/features/auth/state/auth_state.dart';
 import 'package:go_router/go_router.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -12,11 +13,13 @@ class MainMenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Фильмотека'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -30,21 +33,21 @@ class MainMenuScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Добро пожаловать!',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.deepPurple,
+                color: themeState.currentTheme.colorScheme.primary,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Выберите раздел для просмотра:',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
+                color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.6),
               ),
               textAlign: TextAlign.center,
             ),
@@ -59,36 +62,41 @@ class MainMenuScreen extends StatelessWidget {
                     context,
                     'Актеры',
                     Icons.person,
-                    Colors.blue,
+                    themeState.currentTheme.colorScheme.primary,
                         () => context.push('/actors'),
+                    themeState,
                   ),
                   _buildMenuButton(
                     context,
                     'Фильмы',
                     Icons.movie,
-                    Colors.deepPurple,
+                    themeState.currentTheme.colorScheme.primary,
                         () => context.push('/movies'),
+                    themeState,
                   ),
                   _buildMenuButton(
                     context,
                     'Избранное',
                     Icons.favorite,
-                    Colors.deepOrange,
+                    themeState.currentTheme.colorScheme.primary,
                         () => context.push('/favorites'),
+                    themeState,
                   ),
                   _buildMenuButton(
                     context,
                     'Желаемое',
                     Icons.list,
-                    Colors.green,
+                    themeState.currentTheme.colorScheme.primary,
                         () => context.push('/watchlist'),
+                    themeState,
                   ),
                   _buildMenuButton(
                     context,
                     'Настройки',
                     Icons.settings,
-                    Colors.black,
+                    themeState.currentTheme.colorScheme.primary,
                         () => context.push('/settings'),
+                    themeState,
                   ),
                 ],
               ),
@@ -105,6 +113,7 @@ class MainMenuScreen extends StatelessWidget {
       IconData icon,
       Color color,
       VoidCallback onPressed,
+      ThemeState themeState,
       ) {
     return Card(
       elevation: 4,
@@ -116,6 +125,10 @@ class MainMenuScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: themeState.currentTheme.colorScheme.surface,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../state/auth_state.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -22,10 +23,10 @@ class _AuthScreenState extends State<AuthScreen> {
       context.pushReplacement('/main');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Неверный логин или пароль'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
+        SnackBar(
+          content: const Text('Неверный логин или пароль'),
+          backgroundColor: ThemeState.of(context).currentTheme.colorScheme.error,
+          duration: const Duration(seconds: 2),
         ),
       );
     }
@@ -47,13 +48,18 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.deepPurple[400]!, Colors.deepPurple[800]!],
+            colors: [
+              themeState.currentTheme.colorScheme.primaryContainer,
+              themeState.currentTheme.colorScheme.primary,
+            ],
           ),
         ),
         child: Center(
@@ -68,32 +74,33 @@ class _AuthScreenState extends State<AuthScreen> {
                   Icon(
                     Icons.movie_rounded,
                     size: 80,
-                    color: Colors.deepPurple,
+                    color: themeState.currentTheme.colorScheme.primary,
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'Фильмотека',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
+                      color: themeState.currentTheme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     'Войдите в свой аккаунт',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.grey,
+                      color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.6),
                     ),
                   ),
                   const SizedBox(height: 30),
 
                   TextField(
                     controller: _loginController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
                       labelText: 'Логин',
-                      prefixIcon: Icon(Icons.person),
+                      prefixIcon: Icon(Icons.person, color: themeState.currentTheme.colorScheme.primary),
                       hintText: 'Введите admin',
                     ),
                   ),
@@ -101,20 +108,20 @@ class _AuthScreenState extends State<AuthScreen> {
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      border: const OutlineInputBorder(),
                       labelText: 'Пароль',
-                      prefixIcon: Icon(Icons.lock),
+                      prefixIcon: Icon(Icons.lock, color: themeState.currentTheme.colorScheme.primary),
                       hintText: 'Введите 12345',
                     ),
                   ),
                   const SizedBox(height: 10),
 
-                  const Text(
+                  Text(
                     'Для теста: admin / 12345',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.grey,
+                      color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.5),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -126,8 +133,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: ElevatedButton(
                       onPressed: () => _login(context),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.deepPurple,
-                        foregroundColor: Colors.white,
+                        backgroundColor: themeState.currentTheme.colorScheme.primary,
+                        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
                       ),
                       child: const Text(
                         'Войти',

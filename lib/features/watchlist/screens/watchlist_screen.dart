@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/shared/widgets/empty_state.dart';
 import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
 import 'package:flutter_projects/features/watchlist/widgets/watchlist_item_tile.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class WatchlistScreen extends StatefulWidget {
   const WatchlistScreen({super.key});
@@ -31,7 +32,7 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('"${movieData['title']}" добавлен в список'),
-        backgroundColor: Colors.green,
+        backgroundColor: ThemeState.of(context).currentTheme.colorScheme.primary,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -41,14 +42,15 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
     final container = WatchlistContainer.of(context);
     final watchlist = container.watchlist;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Желаемое'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -56,14 +58,15 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
       ),
       body: Column(
         children: [
-          _buildStatistics(),
+          _buildStatistics(themeState),
           const SizedBox(height: 20),
           Expanded(
             child: watchlist.isEmpty
-                ? const EmptyState(
+                ? EmptyState(
               icon: Icons.list,
               title: 'Список пуст',
               subtitle: 'Добавьте фильмы, которые хотите посмотреть',
+              themeState: themeState,
             )
                 : ListView.separated(
               padding: const EdgeInsets.all(20.0),
@@ -85,14 +88,14 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddMovieForm,
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildStatistics() {
+  Widget _buildStatistics(ThemeState themeState) {
     final watchlist = WatchlistContainer.of(context).watchlist;
     final total = watchlist.length;
     final watched = watchlist.where((item) => item.watched).length;
@@ -103,39 +106,43 @@ class _WatchlistScreenState extends State<WatchlistScreen> {
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.green[50],
+        color: themeState.currentTheme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.green[200]!),
+        border: Border.all(color: themeState.currentTheme.colorScheme.outline.withOpacity(0.3)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem('Всего', total.toString(), Icons.movie),
-          _buildStatItem('Просмотрено', watched.toString(), Icons.check_circle),
-          _buildStatItem('Осталось', remaining.toString(), Icons.schedule),
+          _buildStatItem('Всего', total.toString(), Icons.movie, themeState),
+          _buildStatItem('Просмотрено', watched.toString(), Icons.check_circle, themeState),
+          _buildStatItem('Осталось', remaining.toString(), Icons.schedule, themeState),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon) {
+  Widget _buildStatItem(String label, String value, IconData icon, ThemeState themeState) {
     return Column(
       children: [
-        Icon(icon, color: Colors.green[700], size: 24),
+        Icon(
+            icon,
+            color: themeState.currentTheme.colorScheme.onPrimaryContainer,
+            size: 24
+        ),
         const SizedBox(height: 4),
         Text(
           value,
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.green[800],
+            color: themeState.currentTheme.colorScheme.onPrimaryContainer,
           ),
         ),
         Text(
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.green[600],
+            color: themeState.currentTheme.colorScheme.onPrimaryContainer.withOpacity(0.8),
           ),
         ),
       ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/watchlist_item.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class WatchlistItemTile extends StatelessWidget {
   final WatchlistItem item;
@@ -10,6 +11,8 @@ class WatchlistItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       child: Card(
@@ -19,7 +22,7 @@ class WatchlistItemTile extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              _buildMoviePoster(),
+              _buildMoviePoster(themeState),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -30,14 +33,16 @@ class WatchlistItemTile extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: item.watched ? Colors.grey : Colors.green[800],
+                        color: item.watched
+                            ? themeState.currentTheme.colorScheme.onSurface.withOpacity(0.5)
+                            : themeState.currentTheme.colorScheme.primary,
                         decoration: item.watched ? TextDecoration.lineThrough : null,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
-                    _buildStatusBadge(),
+                    _buildStatusBadge(themeState),
                   ],
                 ),
               ),
@@ -52,9 +57,9 @@ class WatchlistItemTile extends StatelessWidget {
                   fillColor: MaterialStateProperty.resolveWith<Color>(
                         (Set<MaterialState> states) {
                       if (states.contains(MaterialState.selected)) {
-                        return Colors.green;
+                        return themeState.currentTheme.colorScheme.primary;
                       }
-                      return Colors.grey;
+                      return themeState.currentTheme.colorScheme.outline;
                     },
                   ),
                 ),
@@ -66,7 +71,7 @@ class WatchlistItemTile extends StatelessWidget {
     );
   }
 
-  Widget _buildMoviePoster() {
+  Widget _buildMoviePoster(ThemeState themeState) {
     final defaultImageUrl = item.imageUrl ?? 'https://avatars.mds.yandex.net/i?id=2834d31489c7357b9f67b9489064ecafb1fd8a03-12601053-images-thumbs&n=13';
 
     return Container(
@@ -92,20 +97,21 @@ class WatchlistItemTile extends StatelessWidget {
               width: 70,
               height: 100,
               progressIndicatorBuilder: (context, url, progress) => Container(
-                color: Colors.grey[200],
+                color: themeState.currentTheme.colorScheme.surfaceVariant,
                 child: Center(
                   child: CircularProgressIndicator(
                     value: progress.progress,
                     strokeWidth: 2,
+                    color: themeState.currentTheme.colorScheme.primary,
                   ),
                 ),
               ),
               errorWidget: (context, url, error) => Container(
-                color: Colors.grey[200],
-                child: const Center(
+                color: themeState.currentTheme.colorScheme.surfaceVariant,
+                child: Center(
                   child: Icon(
                     Icons.movie,
-                    color: Colors.grey,
+                    color: themeState.currentTheme.colorScheme.onSurfaceVariant,
                     size: 30,
                   ),
                 ),
@@ -117,10 +123,10 @@ class WatchlistItemTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   color: Colors.black.withOpacity(0.5),
                 ),
-                child: const Center(
+                child: Center(
                   child: Icon(
                     Icons.check_circle,
-                    color: Colors.white,
+                    color: themeState.currentTheme.colorScheme.onPrimary,
                     size: 30,
                   ),
                 ),
@@ -131,14 +137,18 @@ class WatchlistItemTile extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
+  Widget _buildStatusBadge(ThemeState themeState) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: item.watched ? Colors.grey[200] : Colors.green[50],
+        color: item.watched
+            ? themeState.currentTheme.colorScheme.surfaceVariant
+            : themeState.currentTheme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: item.watched ? Colors.grey : Colors.green[200]!,
+          color: item.watched
+              ? themeState.currentTheme.colorScheme.outline
+              : themeState.currentTheme.colorScheme.primary,
         ),
       ),
       child: Row(
@@ -147,7 +157,9 @@ class WatchlistItemTile extends StatelessWidget {
           Icon(
             item.watched ? Icons.check_circle : Icons.schedule,
             size: 14,
-            color: item.watched ? Colors.grey : Colors.green,
+            color: item.watched
+                ? themeState.currentTheme.colorScheme.onSurfaceVariant
+                : themeState.currentTheme.colorScheme.onPrimaryContainer,
           ),
           const SizedBox(width: 4),
           Text(
@@ -155,7 +167,9 @@ class WatchlistItemTile extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,
-              color: item.watched ? Colors.grey : Colors.green[800],
+              color: item.watched
+                  ? themeState.currentTheme.colorScheme.onSurfaceVariant
+                  : themeState.currentTheme.colorScheme.onPrimaryContainer,
             ),
           ),
         ],

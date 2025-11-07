@@ -19,6 +19,7 @@ import 'package:flutter_projects/features/movies/screens/add_movie_screen.dart';
 import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
 import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
 import 'shared/app_theme.dart';
+import 'shared/theme/theme_state.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/auth',
@@ -105,17 +106,33 @@ final GoRouter _router = GoRouter(
   ],
 );
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Фильмотека',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
+    return ThemeState(
+      isDarkMode: _isDarkMode,
+      toggleTheme: _toggleTheme,
+      child: MaterialApp.router(
+        title: 'Фильмотека',
+        theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+        routerConfig: _router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

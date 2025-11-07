@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_projects/shared/theme/theme_state.dart';
 import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -10,12 +10,12 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _darkTheme = false;
   bool _notifications = true;
-  final String _imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/6/6d/Windows_Settings_app_icon.png';
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Настройки'),
@@ -31,38 +31,77 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: Column(
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 20),
-              width: 200,
-              height: 200,
-              child: CachedNetworkImage(
-                imageUrl: _imageUrl,
-                progressIndicatorBuilder: (context, url, progress) =>
-                const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Center(
-                  child: Icon(
-                    Icons.error,
-                    color: Colors.red,
+              margin: const EdgeInsets.only(bottom: 30),
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: themeState.currentTheme.colorScheme.primaryContainer,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
+                ],
+              ),
+              child: Icon(
+                Icons.settings,
+                size: 60,
+                color: themeState.currentTheme.colorScheme.onPrimaryContainer,
+              ),
+            ),
+
+            Card(
+              elevation: 2,
+              child: SwitchListTile(
+                title: const Text(
+                  'Тёмная тема',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  themeState.isDarkMode ? 'Тёмная тема активна' : 'Светлая тема активна',
+                  style: TextStyle(
+                    color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+                value: themeState.isDarkMode,
+                onChanged: (value) {
+                  themeState.toggleTheme();
+                },
+                secondary: Icon(
+                  themeState.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                  color: themeState.currentTheme.colorScheme.primary,
                 ),
               ),
             ),
-            SwitchListTile(
-              title: const Text('Тёмная тема'),
-              value: _darkTheme,
-              onChanged: (value) {
-                setState(() {
-                  _darkTheme = value;
-                });
-              },
-            ),
-            SwitchListTile(
-              title: const Text('Уведомления'),
-              value: _notifications,
-              onChanged: (value) {
-                setState(() {
-                  _notifications = value;
-                });
-              },
+
+            const SizedBox(height: 16),
+
+            Card(
+              elevation: 2,
+              child: SwitchListTile(
+                title: const Text(
+                  'Уведомления',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                subtitle: Text(
+                  _notifications ? 'Уведомления включены' : 'Уведомления выключены',
+                  style: TextStyle(
+                    color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+                value: _notifications,
+                onChanged: (value) {
+                  setState(() {
+                    _notifications = value;
+                  });
+                },
+                secondary: Icon(
+                  _notifications ? Icons.notifications_active : Icons.notifications_off,
+                  color: themeState.currentTheme.colorScheme.primary,
+                ),
+              ),
             ),
           ],
         ),

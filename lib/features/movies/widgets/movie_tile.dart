@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../models/movie.dart';
+import '../../../shared/theme/theme_state.dart';
 
 class MovieTile extends StatelessWidget {
   final Movie movie;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
-  const MovieTile({super.key, required this.movie, this.onTap});
+  const MovieTile({super.key, required this.movie, this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -21,7 +25,7 @@ class MovieTile extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             child: Row(
               children: [
-                _buildMoviePoster(),
+                _buildMoviePoster(themeState),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -29,9 +33,10 @@ class MovieTile extends StatelessWidget {
                     children: [
                       Text(
                         movie.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: themeState.currentTheme.colorScheme.onSurface,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -43,7 +48,7 @@ class MovieTile extends StatelessWidget {
                         'Рейтинг: ${movie.rating}/10',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.6),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -53,7 +58,7 @@ class MovieTile extends StatelessWidget {
                           '${movie.director ?? ''} ${movie.year != null ? '(${movie.year})' : ''}',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[500],
+                            color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.5),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -62,6 +67,22 @@ class MovieTile extends StatelessWidget {
                     ],
                   ),
                 ),
+                if (onDelete != null)
+                  IconButton(
+                    icon: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: themeState.currentTheme.colorScheme.error.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                          Icons.delete,
+                          color: themeState.currentTheme.colorScheme.error,
+                          size: 20
+                      ),
+                    ),
+                    onPressed: onDelete,
+                  ),
               ],
             ),
           ),
@@ -70,7 +91,7 @@ class MovieTile extends StatelessWidget {
     );
   }
 
-  Widget _buildMoviePoster() {
+  Widget _buildMoviePoster(ThemeState themeState) {
     final defaultImageUrl = movie.imageUrl ?? 'https://via.placeholder.com/70x100/6c757d/ffffff?text=No+Image';
 
     return Container(
@@ -92,20 +113,21 @@ class MovieTile extends StatelessWidget {
           imageUrl: defaultImageUrl,
           fit: BoxFit.cover,
           progressIndicatorBuilder: (context, url, progress) => Container(
-            color: Colors.grey[200],
+            color: themeState.currentTheme.colorScheme.surfaceVariant,
             child: Center(
               child: CircularProgressIndicator(
                 value: progress.progress,
                 strokeWidth: 2,
+                color: themeState.currentTheme.colorScheme.primary,
               ),
             ),
           ),
           errorWidget: (context, url, error) => Container(
-            color: Colors.grey[200],
-            child: const Center(
+            color: themeState.currentTheme.colorScheme.surfaceVariant,
+            child: Center(
               child: Icon(
                 Icons.movie,
-                color: Colors.grey,
+                color: themeState.currentTheme.colorScheme.onSurfaceVariant,
                 size: 30,
               ),
             ),
