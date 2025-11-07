@@ -39,9 +39,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/actors',
       name: 'actors',
-      builder: (context, state) => ActorsContainer(
-        child: ActorsScreen(actors: AppData.actors),
-      ),
+      builder: (context, state) => const ActorsScreen(),
     ),
     GoRoute(
       path: '/actors/add',

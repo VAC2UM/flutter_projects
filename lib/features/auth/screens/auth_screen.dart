@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../state/auth_state.dart';
+import '../../../shared/di/service_locator.dart';
 import '../../../shared/theme/theme_state.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -13,37 +13,23 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final AppStateService _appState = locator<AppStateService>();
 
   void _login(BuildContext context) {
     final login = _loginController.text.trim();
     final password = _passwordController.text.trim();
 
     if (login == 'admin' && password == '12345') {
-      AuthState.login(login);
+      _appState.setCurrentUser(login);
       context.pushReplacement('/main');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Неверный логин или пароль'),
-          backgroundColor: ThemeState.of(context).currentTheme.colorScheme.error,
-          duration: const Duration(seconds: 2),
+        const SnackBar(
+          content: Text('Неверный логин или пароль'),
+          backgroundColor: Colors.red,
         ),
       );
     }
-  }
-
-  void _checkAuthStatus() {
-    if (AuthState.isAuthenticated) {
-      print('Пользователь уже авторизован: ${AuthState.currentUser}');
-    } else {
-      print('Пользователь не авторизован');
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _checkAuthStatus();
   }
 
   @override
@@ -56,10 +42,7 @@ class _AuthScreenState extends State<AuthScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              themeState.currentTheme.colorScheme.primaryContainer,
-              themeState.currentTheme.colorScheme.primary,
-            ],
+            colors: [Colors.deepPurple[400]!, Colors.deepPurple[800]!],
           ),
         ),
         child: Center(
@@ -74,15 +57,14 @@ class _AuthScreenState extends State<AuthScreen> {
                   Icon(
                     Icons.movie_rounded,
                     size: 80,
-                    color: themeState.currentTheme.colorScheme.primary,
+                    color: Colors.deepPurple,
                   ),
                   const SizedBox(height: 20),
-                  Text(
+                  const Text(
                     'Фильмотека',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: themeState.currentTheme.colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 10),

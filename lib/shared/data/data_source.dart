@@ -1,9 +1,8 @@
 import 'package:flutter_projects/features/actors/actors_feature.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
-import 'package:flutter_projects/features/watchlist/models/watchlist_item.dart';
 
 class AppData {
-  static final List<Actor> actors = [
+  final List<Actor> actors = [
     Actor(id: '1', name: 'Юра Борисов', imageUrl: 'https://static1.tgstat.ru/channels/_0/66/66d1a80fb5e8f400a2ddd816cc92ad95.jpg'),
     Actor(id: '2', name: 'Хоакин Феникс', imageUrl: 'https://images.iptv.rt.ru/images/cpt8sk3ir4sqiatbcj90.jpg'),
     Actor(id: '3', name: 'Брайан Крэнстон', imageUrl: 'https://avatars.mds.yandex.net/i?id=ad1cff5319fcd4bc26ae7ab9aa63e091_l-5387132-images-thumbs&n=13'),
