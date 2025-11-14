@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../app_theme.dart';
+import 'package:flutter_projects/shared/app_theme.dart';
 
 class ThemeState extends InheritedWidget {
   final bool isDarkMode;

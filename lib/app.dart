@@ -6,6 +6,8 @@ import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
+import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
+import 'package:flutter_projects/features/settings/state/settings_state.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
 import 'package:go_router/go_router.dart';
@@ -135,6 +137,7 @@ final GoRouter _router = GoRouter(
   ],
 );
 
+// main.dart
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -143,27 +146,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isDarkMode = false;
-
-  void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: ThemeState(
-        isDarkMode: _isDarkMode,
-        toggleTheme: _toggleTheme,
-        child: MaterialApp.router(
-          title: 'Фильмотека',
-          theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
-          routerConfig: _router,
-          debugShowCheckedModeBanner: false,
-        ),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider(create: (context) => SettingsCubit()),
+      ],
+      child: BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, settingsState) {
+          return ThemeState(
+            isDarkMode: settingsState.isDarkMode,
+            toggleTheme: () {
+              context.read<SettingsCubit>().toggleTheme();
+            },
+            child: MaterialApp.router(
+              title: 'Фильмотека',
+              theme: settingsState.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+              routerConfig: _router,
+              debugShowCheckedModeBanner: false,
+            ),
+          );
+        },
       ),
     );
   }
