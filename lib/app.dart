@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
+import 'package:flutter_projects/features/auth/state/auth_state.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
@@ -14,7 +16,6 @@ import 'package:flutter_projects/features/movies/screens/movies_list_screen.dart
 import 'package:flutter_projects/features/favorites/screens/favorites_screen.dart';
 import 'package:flutter_projects/features/watchlist/screens/watchlist_screen.dart';
 import 'package:flutter_projects/features/settings/settings_feature.dart';
-import 'package:flutter_projects/features/actors/state/actors_container.dart';
 import 'package:flutter_projects/features/movies/state/movies_container.dart';
 import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
 import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
@@ -38,7 +39,14 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/main',
       name: 'main',
-      builder: (context, state) => const MainMenuScreen(),
+      builder: (context, state) => BlocListener<AuthCubit, AuthState>(
+        listener: (context, state) {
+          if (!state.isAuthenticated) {
+            context.go('/auth');
+          }
+        },
+        child: const MainMenuScreen(),
+      ),
     ),
 
     GoRoute(
@@ -145,14 +153,17 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ThemeState(
-      isDarkMode: _isDarkMode,
-      toggleTheme: _toggleTheme,
-      child: MaterialApp.router(
-        title: 'Фильмотека',
-        theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
+    return BlocProvider(
+      create: (context) => AuthCubit(),
+      child: ThemeState(
+        isDarkMode: _isDarkMode,
+        toggleTheme: _toggleTheme,
+        child: MaterialApp.router(
+          title: 'Фильмотека',
+          theme: _isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+          routerConfig: _router,
+          debugShowCheckedModeBanner: false,
+        ),
       ),
     );
   }

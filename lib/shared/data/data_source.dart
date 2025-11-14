@@ -50,9 +50,7 @@ class AppData {
       name: 'Иван Петров',
       email: 'ivan.petrov@example.com',
       avatarUrl: 'https://i.pinimg.com/originals/d7/92/04/d79204dc601b615a329ea4c679adb481.jpg',
-      joinDate: DateTime(2024, 1, 15),
-      favoriteMoviesCount: 5,
-      watchlistCount: 3,
+      joinDate: DateTime(2025, 11, 14),
     );
 
     return AppData(

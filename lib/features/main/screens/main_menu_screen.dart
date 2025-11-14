@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_projects/features/auth/state/auth_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
 import 'package:go_router/go_router.dart';
 import '../../../shared/theme/theme_state.dart';
 
@@ -7,7 +8,7 @@ class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
 
   void _logout(BuildContext context) {
-    AuthState.logout();
+    context.read<AuthCubit>().logout();
     context.pushReplacement('/auth');
   }
 
@@ -29,7 +30,7 @@ class MainMenuScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
-            tooltip: 'Выйти из профиля',
+            tooltip: 'Выйти',
           ),
         ],
       ),
