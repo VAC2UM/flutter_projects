@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
+import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
+import 'package:flutter_projects/shared/di/service_locator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/auth/screens/auth_screen.dart';
 import 'package:flutter_projects/features/main/screens/main_menu_screen.dart';
@@ -51,7 +53,7 @@ final GoRouter _router = GoRouter(
       path: '/movies',
       name: 'movies',
       builder: (context, state) => MoviesContainer(
-        child: MoviesListScreen(movies: AppData.movies),
+        child: MoviesListScreen(movies: locator<AppData>().movies),
       ),
     ),
     GoRoute(
@@ -100,6 +102,12 @@ final GoRouter _router = GoRouter(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+
+    GoRoute(
+      path: '/profile',
+      name: 'profile',
+      builder: (context, state) => const ProfileScreen(),
     ),
   ],
 );

@@ -18,6 +18,6 @@ class AppStateService {
 }
 
 void setupLocator() {
-  locator.registerSingleton<AppData>(AppData());
+  locator.registerSingleton<AppData>(AppData.initial());
   locator.registerSingleton<AppStateService>(AppStateService());
 }
