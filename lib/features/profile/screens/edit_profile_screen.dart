@@ -1,18 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_projects/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_projects/features/profile/models/user.dart';
 import 'package:flutter_projects/features/profile/state/profile_state.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_projects/shared/theme/theme_state.dart';
 
 class EditProfileScreen extends StatelessWidget {
   const EditProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final state = GoRouterState.of(context);
+    final profileCubit = state.extra as ProfileCubit;
+
+    return BlocProvider.value(
+      value: profileCubit,
+      child: const EditProfileView(),
+    );
+  }
+}
+
+class EditProfileView extends StatelessWidget {
+  const EditProfileView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Редактировать профиль'),
+        backgroundColor: themeState.currentTheme.colorScheme.primary,
+        foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -73,37 +93,53 @@ class _EditProfileFormState extends State<_EditProfileForm> {
 
   @override
   Widget build(BuildContext context) {
+    final themeState = ThemeState.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
           TextField(
             controller: _nameController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Имя',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              prefixIcon: Icon(
+                Icons.person,
+                color: themeState.currentTheme.colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _emailController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Email',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              prefixIcon: Icon(
+                Icons.email,
+                color: themeState.currentTheme.colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 16),
           TextField(
             controller: _avatarController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'URL аватара (опционально)',
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
+              prefixIcon: Icon(
+                Icons.link,
+                color: themeState.currentTheme.colorScheme.primary,
+              ),
             ),
           ),
           const SizedBox(height: 32),
           ElevatedButton(
             onPressed: () => _saveProfile(context),
             style: ElevatedButton.styleFrom(
+              backgroundColor: themeState.currentTheme.colorScheme.primary,
+              foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
               minimumSize: const Size(double.infinity, 50),
             ),
             child: const Text('Сохранить изменения'),
