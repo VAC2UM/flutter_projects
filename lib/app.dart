@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
+import 'package:flutter_projects/features/profile/cubit/profile_cubit.dart';
+import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
@@ -108,6 +111,18 @@ final GoRouter _router = GoRouter(
       path: '/profile',
       name: 'profile',
       builder: (context, state) => const ProfileScreen(),
+    ),
+
+    GoRoute(
+      path: '/profile/edit',
+      name: 'edit',
+      builder: (context, state) {
+        final profileCubit = state.extra as ProfileCubit;
+        return BlocProvider.value(
+          value: profileCubit,
+          child: const EditProfileScreen(),
+        );
+      },
     ),
   ],
 );
