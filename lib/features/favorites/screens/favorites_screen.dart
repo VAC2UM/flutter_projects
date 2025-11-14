@@ -1,59 +1,67 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_projects/features/favorites/favorites_feature.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_projects/shared/widgets/empty_state.dart';
-import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
+import 'package:flutter_projects/features/favorites/cubit/favorites_cubit.dart';
+import 'package:flutter_projects/features/favorites/state/favorites_state.dart';
 import 'package:flutter_projects/features/favorites/widgets/favorite_tile.dart';
-import '../../../shared/theme/theme_state.dart';
+import 'package:flutter_projects/shared/widgets/empty_state.dart';
+import 'package:flutter_projects/shared/theme/theme_state.dart';
 
-class FavoritesScreen extends StatefulWidget {
+class FavoritesScreen extends StatelessWidget {
   const FavoritesScreen({super.key});
 
   @override
-  State<FavoritesScreen> createState() => _FavoritesScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => FavoritesCubit(),
+      child: const FavoritesView(),
+    );
+  }
 }
 
-class _FavoritesScreenState extends State<FavoritesScreen> {
-  void _openAddFavoriteForm() async {
-    final container = FavoritesContainer.of(context);
-    if (container.favorites.length >= 4) {
-      _showLimitDialog();
+class FavoritesView extends StatelessWidget {
+  const FavoritesView({super.key});
+
+  void _openAddFavoriteForm(BuildContext context) async {
+    final cubit = context.read<FavoritesCubit>();
+    final state = cubit.state;
+
+    if (state.isLimitReached) {
+      _showLimitDialog(context);
       return;
     }
 
-    final result = await context.push('/favorites/add');
+    final result = await context.push(
+      '/favorites/add',
+      extra: cubit,
+    );
 
     if (result != null && result is Map<String, dynamic>) {
-      _addFavoriteFromForm(result);
+      cubit.addFavorite(
+        title: result['title'],
+        imageUrl: result['imageUrl'].isEmpty ? null : result['imageUrl'],
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"${result['title']}" добавлен в избранное'),
+          backgroundColor: ThemeState.of(context).currentTheme.colorScheme.primary,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
-  void _addFavoriteFromForm(Map<String, dynamic> favoriteData) {
-    final container = FavoritesContainer.of(context);
-
-    container.addFavorite(
-      title: favoriteData['title'],
-      imageUrl: favoriteData['imageUrl'].isEmpty ? null : favoriteData['imageUrl'],
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('"${favoriteData['title']}" добавлен в избранное'),
-        backgroundColor: ThemeState.of(context).currentTheme.colorScheme.primary,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-
-    setState(() {});
-  }
-
-  void _showLimitDialog() {
+  void _showLimitDialog(BuildContext context) {
     final themeState = ThemeState.of(context);
+    final maxFavorites = context.read<FavoritesCubit>().state.maxFavorites;
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Лимит достигнут'),
-        content: const Text('Нельзя добавить более 4 фильмов в избранное.'),
+        content: Text('Нельзя добавить более $maxFavorites фильмов в избранное.'),
         actions: [
           TextButton(
             onPressed: () => context.pop(),
@@ -69,11 +77,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
+  void _deleteFavoriteWithUndo(BuildContext context, Favorite favorite) {
+    final cubit = context.read<FavoritesCubit>();
+    final originalIndex = cubit.state.favorites.indexOf(favorite);
+
+    cubit.deleteFavorite(favorite.id);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Удалён из избранного: ${favorite.title}'),
+        action: SnackBarAction(
+          label: 'Отменить',
+          onPressed: () {
+            cubit.restoreFavorite(favorite, originalIndex);
+          },
+        ),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeState = ThemeState.of(context);
-    final container = FavoritesContainer.of(context);
-    final favorites = container.favorites;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,42 +110,92 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
         ),
-      ),
-      body: Column(
-        children: [
-          _buildFavoritesCounter(favorites.length, themeState),
-          const SizedBox(height: 20),
-          Expanded(
-            child: favorites.isEmpty
-                ? EmptyState(
-              icon: Icons.favorite_border,
-              title: 'Нет избранных фильмов',
-              subtitle: 'Добавьте фильмы в избранное',
-              themeState: themeState,
-            )
-                : ListView.separated(
-              padding: const EdgeInsets.all(20.0),
-              itemCount: favorites.length,
-              separatorBuilder: (context, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) {
-                final favorite = favorites[index];
-                return FavoriteTile(
-                  favorite: favorite,
-                  onDelete: () {
-                    container.deleteFavorite(
-                      context,
-                      favorite.id,
-                          () => setState(() {}),
-                    );
-                  },
+        actions: [
+          BlocBuilder<FavoritesCubit, FavoritesState>(
+            builder: (context, state) {
+              if (state.favorites.isNotEmpty) {
+                return IconButton(
+                  icon: const Icon(Icons.delete_sweep),
+                  onPressed: () => _showClearAllDialog(context),
+                  tooltip: 'Очистить все',
                 );
-              },
-            ),
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),
+      body: BlocBuilder<FavoritesCubit, FavoritesState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.error != null) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.error_outline,
+                    size: 64,
+                    color: themeState.currentTheme.colorScheme.error,
+                  ),
+                  const SizedBox(height: 16),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Text(
+                      state.error!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: themeState.currentTheme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<FavoritesCubit>().clearError();
+                      context.read<FavoritesCubit>().loadFavorites();
+                    },
+                    child: const Text('Повторить'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return Column(
+            children: [
+              _buildFavoritesCounter(state, themeState),
+              const SizedBox(height: 20),
+              Expanded(
+                child: state.favorites.isEmpty
+                    ? EmptyState(
+                  icon: Icons.favorite_border,
+                  title: 'Нет избранных фильмов',
+                  subtitle: 'Добавьте фильмы в избранное',
+                  themeState: themeState,
+                )
+                    : ListView.separated(
+                  padding: const EdgeInsets.all(20.0),
+                  itemCount: state.favorites.length,
+                  separatorBuilder: (context, _) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final favorite = state.favorites[index];
+                    return FavoriteTile(
+                      favorite: favorite,
+                      onDelete: () => _deleteFavoriteWithUndo(context, favorite),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddFavoriteForm,
+        onPressed: () => _openAddFavoriteForm(context),
         backgroundColor: themeState.currentTheme.colorScheme.primary,
         foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         child: const Icon(Icons.add),
@@ -127,7 +203,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
   }
 
-  Widget _buildFavoritesCounter(int count, ThemeState themeState) {
+  Widget _buildFavoritesCounter(FavoritesState state, ThemeState themeState) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.all(20),
@@ -151,15 +227,60 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: themeState.currentTheme.colorScheme.primary,
+              color: state.isLimitReached
+                  ? themeState.currentTheme.colorScheme.error
+                  : themeState.currentTheme.colorScheme.primary,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
-              '$count/4',
+              '${state.favoritesCount}/${state.maxFavorites}',
               style: TextStyle(
                 color: themeState.currentTheme.colorScheme.onPrimary,
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showClearAllDialog(BuildContext context) {
+    final themeState = ThemeState.of(context);
+    final cubit = context.read<FavoritesCubit>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Очистить все'),
+        content: const Text('Вы уверены, что хотите удалить все избранные фильмы?'),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: Text(
+              'Отмена',
+              style: TextStyle(
+                color: themeState.currentTheme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              cubit.clearAllFavorites();
+              context.pop();
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Все избранные фильмы удалены'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            child: Text(
+              'Очистить',
+              style: TextStyle(
+                color: themeState.currentTheme.colorScheme.error,
               ),
             ),
           ),

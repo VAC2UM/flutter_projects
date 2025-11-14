@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
-import 'package:flutter_projects/features/auth/state/auth_state.dart';
+import 'package:flutter_projects/features/favorites/cubit/favorites_cubit.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
-import 'package:flutter_projects/features/profile/cubit/profile_cubit.dart';
 import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
 import 'package:flutter_projects/features/settings/state/settings_state.dart';
+import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
 import 'package:go_router/go_router.dart';
@@ -17,15 +17,12 @@ import 'package:flutter_projects/features/actors/screens/actors_screen.dart';
 import 'package:flutter_projects/features/movies/screens/movies_list_screen.dart';
 import 'package:flutter_projects/features/favorites/screens/favorites_screen.dart';
 import 'package:flutter_projects/features/watchlist/screens/watchlist_screen.dart';
-import 'package:flutter_projects/features/settings/settings_feature.dart';
-import 'package:flutter_projects/features/movies/state/movies_container.dart';
-import 'package:flutter_projects/features/favorites/state/favorites_container.dart';
-import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
-import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
+import 'package:flutter_projects/features/settings/screens/settings_screen.dart';
 import 'package:flutter_projects/features/actors/screens/add_actor_screen.dart';
 import 'package:flutter_projects/features/movies/screens/add_movie_screen.dart';
 import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
 import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
+import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
 import 'shared/app_theme.dart';
 import 'shared/theme/theme_state.dart';
 
@@ -41,16 +38,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/main',
       name: 'main',
-      builder: (context, state) => BlocListener<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (!state.isAuthenticated) {
-            context.go('/auth');
-          }
-        },
-        child: const MainMenuScreen(),
-      ),
+      builder: (context, state) => const MainMenuScreen(),
     ),
 
+    // Actors Section
     GoRoute(
       path: '/actors',
       name: 'actors',
@@ -62,12 +53,11 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const AddActorScreen(),
     ),
 
+    // Movies Section
     GoRoute(
       path: '/movies',
       name: 'movies',
-      builder: (context, state) => MoviesContainer(
-        child: MoviesListScreen(movies: locator<AppData>().movies),
-      ),
+      builder: (context, state) => MoviesListScreen(movies: locator<AppData>().movies),
     ),
     GoRoute(
       path: '/movies/add',
@@ -87,9 +77,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/favorites',
       name: 'favorites',
-      builder: (context, state) => const FavoritesContainer(
-        child: FavoritesScreen(),
-      ),
+      builder: (context, state) => const FavoritesScreen(),
     ),
     GoRoute(
       path: '/favorites/add',
@@ -111,33 +99,27 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const AddWatchlistScreen(),
     ),
 
+    // Settings Section
     GoRoute(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
     ),
 
+    // Profile Section
     GoRoute(
       path: '/profile',
       name: 'profile',
       builder: (context, state) => const ProfileScreen(),
     ),
-
     GoRoute(
       path: '/profile/edit',
-      name: 'edit',
-      builder: (context, state) {
-        final profileCubit = state.extra as ProfileCubit;
-        return BlocProvider.value(
-          value: profileCubit,
-          child: const EditProfileScreen(),
-        );
-      },
+      name: 'editProfile',
+      builder: (context, state) => const EditProfileScreen(),
     ),
   ],
 );
 
-// main.dart
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
@@ -146,12 +128,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  bool _isDarkMode = false;
+
+  void _toggleTheme() {
+    setState(() {
+      _isDarkMode = !_isDarkMode;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => SettingsCubit()),
+        BlocProvider(create: (context) => FavoritesCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
