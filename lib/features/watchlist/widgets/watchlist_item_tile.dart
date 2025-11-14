@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/watchlist_item.dart';
-import '../../../shared/theme/theme_state.dart';
+import 'package:flutter_projects/features/watchlist/models/watchlist_item.dart';
+import 'package:flutter_projects/shared/theme/theme_state.dart';
 
 class WatchlistItemTile extends StatelessWidget {
   final WatchlistItem item;
   final ValueChanged<bool>? onChanged;
+  final VoidCallback? onDelete;
 
-  const WatchlistItemTile({super.key, required this.item, this.onChanged});
+  const WatchlistItemTile({
+    super.key,
+    required this.item,
+    this.onChanged,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +70,22 @@ class WatchlistItemTile extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onDelete != null)
+                IconButton(
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: themeState.currentTheme.colorScheme.error.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.delete,
+                      color: themeState.currentTheme.colorScheme.error,
+                      size: 20,
+                    ),
+                  ),
+                  onPressed: onDelete,
+                ),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:flutter_projects/features/profile/screens/edit_profile_screen.da
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
 import 'package:flutter_projects/features/settings/state/settings_state.dart';
+import 'package:flutter_projects/features/watchlist/cubit/watchlist_cubit.dart';
 import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
@@ -89,9 +90,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/watchlist',
       name: 'watchlist',
-      builder: (context, state) => const WatchlistContainer(
-        child: WatchlistScreen(),
-      ),
+      builder: (context, state) => const WatchlistScreen(),
     ),
     GoRoute(
       path: '/watchlist/add',
@@ -128,14 +127,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isDarkMode = false;
-
-  void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -143,6 +134,7 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => SettingsCubit()),
         BlocProvider(create: (context) => FavoritesCubit()),
+        BlocProvider(create: (context) => WatchlistCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
