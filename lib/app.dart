@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
+import 'package:flutter_projects/features/directors/screens/directors_screen.dart';
 import 'package:flutter_projects/features/favorites/cubit/favorites_cubit.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
 import 'package:flutter_projects/features/settings/state/settings_state.dart';
+import 'package:flutter_projects/features/studios/screens/studios_screen.dart';
 import 'package:flutter_projects/features/watchlist/cubit/watchlist_cubit.dart';
 import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
 import 'package:flutter_projects/shared/data/data_source.dart';
@@ -115,6 +117,18 @@ final GoRouter _router = GoRouter(
       path: '/profile/edit',
       name: 'editProfile',
       builder: (context, state) => const EditProfileScreen(),
+    ),
+
+    GoRoute(
+      path: '/studios',
+      name: 'studios',
+      builder: (context, state) => const StudiosScreen(),
+    ),
+
+    GoRoute(
+      path: '/directors',
+      name: 'directors',
+      builder: (context, state) => const DirectorsScreen(),
     ),
   ],
 );

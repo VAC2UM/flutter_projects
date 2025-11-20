@@ -1,12 +1,16 @@
 import 'package:flutter_projects/features/actors/actors_feature.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/profile/models/user.dart';
+import 'package:flutter_projects/features/studios/models/studio.dart';
+import 'package:flutter_projects/features/directors/models/director.dart';
 
 class AppData {
   final List<Actor> actors;
   final List<Movie> movies;
   final List<Movie> favorites;
   final List<Movie> watchlist;
+  final List<Studio> studios;
+  final List<Director> directors;
   final User currentUser;
 
   AppData({
@@ -14,6 +18,8 @@ class AppData {
     required this.movies,
     required this.favorites,
     required this.watchlist,
+    required this.studios,
+    required this.directors,
     required this.currentUser,
   });
 
@@ -45,6 +51,40 @@ class AppData {
       ),
     ];
 
+    final studios = [
+      Studio(
+        id: '1',
+        name: 'Marvel Studios',
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Marvel_Logo.svg/1200px-Marvel_Logo.svg.png',
+        foundedYear: 1993,
+        country: 'США',
+      ),
+      Studio(
+        id: '2',
+        name: 'Warner Bros.',
+        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Warner_Bros_logo.svg/1965px-Warner_Bros_logo.svg.png',
+        foundedYear: 1923,
+        country: 'США',
+      ),
+    ];
+
+    final directors = [
+      Director(
+        id: '1',
+        name: 'Кристофер Нолан',
+        imageUrl: 'https://avatars.mds.yandex.net/i?id=4c8a58773f24c8ce6cf949d86089829493cfb322-4554202-images-thumbs&n=13',
+        birthYear: 1970,
+        country: 'Великобритания',
+      ),
+      Director(
+        id: '2',
+        name: 'Квентин Тарантино',
+        imageUrl: 'https://avatars.mds.yandex.net/i?id=184f84417630a5ad4f3db5f161b14d15-4443391-images-thumbs&n=13',
+        birthYear: 1963,
+        country: 'США',
+      ),
+    ];
+
     final currentUser = User(
       id: '1',
       name: 'Иван Петров',
@@ -58,6 +98,8 @@ class AppData {
       movies: movies,
       favorites: [movies[0]],
       watchlist: [movies[1]],
+      studios: studios,
+      directors: directors,
       currentUser: currentUser,
     );
   }
@@ -67,6 +109,8 @@ class AppData {
     List<Movie>? movies,
     List<Movie>? favorites,
     List<Movie>? watchlist,
+    List<Studio>? studios,
+    List<Director>? directors,
     User? currentUser,
   }) {
     return AppData(
@@ -74,6 +118,8 @@ class AppData {
       movies: movies ?? this.movies,
       favorites: favorites ?? this.favorites,
       watchlist: watchlist ?? this.watchlist,
+      studios: studios ?? this.studios,
+      directors: directors ?? this.directors,
       currentUser: currentUser ?? this.currentUser,
     );
   }

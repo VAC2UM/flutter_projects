@@ -1,15 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
-import 'package:go_router/go_router.dart';
-import '../../../shared/theme/theme_state.dart';
+import 'package:flutter_projects/shared/theme/theme_state.dart';
 
-class MainMenuScreen extends StatelessWidget {
+class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({super.key});
+
+  @override
+  State<MainMenuScreen> createState() => _MainMenuScreenState();
+}
+
+class _MainMenuScreenState extends State<MainMenuScreen> {
+  int _selectedIndex = 0;
+
+  final List<Map<String, dynamic>> _menuItems = [
+    {
+      'title': 'Актеры',
+      'icon': Icons.person,
+      'color': Colors.blue,
+      'route': '/actors',
+    },
+    {
+      'title': 'Фильмы',
+      'icon': Icons.movie,
+      'color': Colors.green,
+      'route': '/movies',
+    },
+    {
+      'title': 'Режиссеры',
+      'icon': Icons.theaters,
+      'color': Colors.orange,
+      'route': '/directors',
+    },
+    {
+      'title': 'Кинокомпании',
+      'icon': Icons.business,
+      'color': Colors.purple,
+      'route': '/studios',
+    },
+    {
+      'title': 'Избранное',
+      'icon': Icons.favorite,
+      'color': Colors.red,
+      'route': '/favorites',
+    },
+    {
+      'title': 'Желаемое',
+      'icon': Icons.list,
+      'color': Colors.amber,
+      'route': '/watchlist',
+    },
+    {
+      'title': 'Профиль',
+      'icon': Icons.person_outline,
+      'color': Colors.teal,
+      'route': '/profile',
+    },
+    {
+      'title': 'Настройки',
+      'icon': Icons.settings,
+      'color': Colors.grey,
+      'route': '/settings',
+    },
+  ];
 
   void _logout(BuildContext context) {
     context.read<AuthCubit>().logout();
     context.pushReplacement('/auth');
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    context.push(_menuItems[index]['route']);
   }
 
   @override
@@ -59,60 +124,21 @@ class MainMenuScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                children: [
-                  _buildMenuButton(
+              child: ListView.separated(
+                itemCount: _menuItems.length,
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final item = _menuItems[index];
+                  return _buildMenuListItem(
                     context,
-                    'Актеры',
-                    Icons.person,
-                    Colors.blue,
-                        () => context.push('/actors'),
+                    item['title'],
+                    item['icon'],
+                    item['color'],
+                        () => _onItemTapped(index),
                     themeState,
-                  ),
-                  _buildMenuButton(
-                    context,
-                    'Фильмы',
-                    Icons.movie,
-                    Colors.green,
-                        () => context.push('/movies'),
-                    themeState,
-                  ),
-                  _buildMenuButton(
-                    context,
-                    'Избранное',
-                    Icons.favorite,
-                    Colors.red,
-                        () => context.push('/favorites'),
-                    themeState,
-                  ),
-                  _buildMenuButton(
-                    context,
-                    'Желаемое',
-                    Icons.list,
-                    Colors.orange,
-                        () => context.push('/watchlist'),
-                    themeState,
-                  ),
-                  _buildMenuButton(
-                    context,
-                    'Профиль',
-                    Icons.person_outline,
-                    Colors.purple,
-                        () => context.push('/profile'),
-                    themeState,
-                  ),
-                  _buildMenuButton(
-                    context,
-                    'Настройки',
-                    Icons.settings,
-                    Colors.grey,
-                        () => context.push('/settings'),
-                    themeState,
-                  ),
-                ],
+                    index == _selectedIndex,
+                  );
+                },
               ),
             ),
           ],
@@ -121,21 +147,25 @@ class MainMenuScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(
+  Widget _buildMenuListItem(
       BuildContext context,
       String title,
       IconData icon,
       Color color,
-      VoidCallback onPressed,
+      VoidCallback onTap,
       ThemeState themeState,
+      bool isSelected,
       ) {
     return Card(
-      elevation: 4,
+      elevation: isSelected ? 6 : 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: isSelected
+            ? BorderSide(color: color, width: 2)
+            : BorderSide.none,
       ),
       child: InkWell(
-        onTap: onPressed,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -143,23 +173,34 @@ class MainMenuScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             color: themeState.currentTheme.colorScheme.surface,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
-              Icon(
-                icon,
-                size: 40,
-                color: color,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 24,
                   color: color,
                 ),
-                textAlign: TextAlign.center,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: themeState.currentTheme.colorScheme.onSurface,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: themeState.currentTheme.colorScheme.onSurface.withOpacity(0.5),
               ),
             ],
           ),
