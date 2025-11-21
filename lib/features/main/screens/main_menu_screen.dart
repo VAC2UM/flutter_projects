@@ -52,6 +52,12 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       'route': '/watchlist',
     },
     {
+      'title': 'Отзывы',
+      'icon': Icons.reviews,
+      'color': Colors.indigo,
+      'route': '/reviews',
+    },
+    {
       'title': 'Профиль',
       'icon': Icons.person_outline,
       'color': Colors.teal,
@@ -62,7 +68,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       'icon': Icons.settings,
       'color': Colors.grey,
       'route': '/settings',
-    },
+    }
   ];
 
   void _logout(BuildContext context) {

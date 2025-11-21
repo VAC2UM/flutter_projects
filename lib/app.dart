@@ -6,6 +6,8 @@ import 'package:flutter_projects/features/favorites/cubit/favorites_cubit.dart';
 import 'package:flutter_projects/features/movies/models/movie.dart';
 import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
+import 'package:flutter_projects/features/reviews/screens/add_review_screen.dart';
+import 'package:flutter_projects/features/reviews/screens/reviews_screen.dart';
 import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
 import 'package:flutter_projects/features/settings/state/settings_state.dart';
 import 'package:flutter_projects/features/studios/screens/studios_screen.dart';
@@ -129,6 +131,17 @@ final GoRouter _router = GoRouter(
       path: '/directors',
       name: 'directors',
       builder: (context, state) => const DirectorsScreen(),
+    ),
+
+    GoRoute(
+      path: '/reviews',
+      name: 'reviews',
+      builder: (context, state) => const ReviewsScreen(),
+    ),
+    GoRoute(
+      path: '/reviews/add',
+      name: 'addReview',
+      builder: (context, state) => const AddReviewScreen(),
     ),
   ],
 );
