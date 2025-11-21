@@ -29,7 +29,6 @@ class AddReviewView extends StatefulWidget {
 
 class _AddReviewViewState extends State<AddReviewView> {
   final TextEditingController _movieTitleController = TextEditingController();
-  final TextEditingController _authorController = TextEditingController();
   final TextEditingController _reviewTextController = TextEditingController();
   final TextEditingController _moviePosterController = TextEditingController();
 
@@ -38,10 +37,9 @@ class _AddReviewViewState extends State<AddReviewView> {
 
   void _submitReview(BuildContext context) {
     final movieTitle = _movieTitleController.text.trim();
-    final author = _authorController.text.trim();
     final reviewText = _reviewTextController.text.trim();
 
-    if (movieTitle.isEmpty || author.isEmpty || reviewText.isEmpty) {
+    if (movieTitle.isEmpty || reviewText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Заполните все обязательные поля'),
@@ -79,7 +77,6 @@ class _AddReviewViewState extends State<AddReviewView> {
   @override
   void dispose() {
     _movieTitleController.dispose();
-    _authorController.dispose();
     _reviewTextController.dispose();
     _moviePosterController.dispose();
     super.dispose();
