@@ -22,7 +22,11 @@ import '../../domain/usecases/add_watchlist_item.dart';
 import '../../domain/usecases/delete_watchlist_item.dart';
 import '../../domain/usecases/toggle_watched.dart';
 import '../../ui/features/watchlist/delegates/watchlist_bloc.dart';
+import '../../data/datasources/reviews_local_data_source.dart';
+import '../../ui/features/reviews/delegates/reviews_cubit.dart';
 import '../data/data_source.dart';
+import '../data/preferences_helper.dart';
+import '../data/database_helper.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -40,7 +44,11 @@ class AppStateService {
   bool get isAuthenticated => currentUser.isNotEmpty;
 }
 
-void setupLocator() {
+Future<void> setupLocator() async {
+  // Initialize storage
+  await PreferencesHelper.init();
+  await DatabaseHelper.database; // Initialize database
+
   // Data Sources
   locator.registerLazySingleton<MoviesLocalDataSource>(
     () => MoviesLocalDataSourceImpl(),
@@ -50,6 +58,9 @@ void setupLocator() {
   );
   locator.registerLazySingleton<WatchlistLocalDataSource>(
     () => WatchlistLocalDataSourceImpl(),
+  );
+  locator.registerLazySingleton<ReviewsLocalDataSource>(
+    () => ReviewsLocalDataSourceImpl(),
   );
 
   // Repositories
@@ -121,6 +132,7 @@ void setupLocator() {
       repository: locator<WatchlistRepository>(),
     ),
   );
+  locator.registerLazySingleton(() => ReviewsCubit());
 
   // App State Service
   locator.registerSingleton<AppStateService>(AppStateService());

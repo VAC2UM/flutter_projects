@@ -38,7 +38,33 @@ class MovieDto extends Movie {
     );
   }
 
+  factory MovieDto.fromMap(Map<String, dynamic> map) {
+    return MovieDto(
+      id: map['id'] as String,
+      title: map['title'] as String,
+      rating: map['rating'] as int,
+      imageUrl: map['imageUrl'] as String?,
+      description: map['description'] as String?,
+      year: map['year'] as int?,
+      genre: map['genre'] as String?,
+      director: map['director'] as String?,
+    );
+  }
+
   Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'rating': rating,
+      'imageUrl': imageUrl,
+      'description': description,
+      'year': year,
+      'genre': genre,
+      'director': director,
+    };
+  }
+
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
       'title': title,

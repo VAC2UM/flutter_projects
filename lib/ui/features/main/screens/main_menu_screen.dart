@@ -71,9 +71,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     },
   ];
 
-  void _logout(BuildContext context) {
-    context.read<AuthCubit>().logout();
-    context.pushReplacement('/auth');
+  Future<void> _logout(BuildContext context) async {
+    await context.read<AuthCubit>().logout();
+    // Redirect в GoRouter автоматически перенаправит на /auth
   }
 
   void _onItemTapped(int index) {

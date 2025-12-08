@@ -1,4 +1,6 @@
 import '../dto/watchlist_item_dto.dart';
+import '../../../shared/data/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 abstract class WatchlistLocalDataSource {
   Future<List<WatchlistItemDto>> getWatchlist();
@@ -10,54 +12,85 @@ abstract class WatchlistLocalDataSource {
 }
 
 class WatchlistLocalDataSourceImpl implements WatchlistLocalDataSource {
-  final List<WatchlistItemDto> _items = [];
-
   @override
   Future<List<WatchlistItemDto>> getWatchlist() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return List.from(_items);
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      DatabaseHelper.tableWatchlist,
+    );
+
+    return List.generate(maps.length, (i) {
+      return WatchlistItemDto.fromMap(maps[i]);
+    });
   }
 
   @override
   Future<WatchlistItemDto> addItem(WatchlistItemDto item) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _items.add(item);
+    final db = await DatabaseHelper.database;
+    await db.insert(
+      DatabaseHelper.tableWatchlist,
+      item.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
     return item;
   }
 
   @override
   Future<void> deleteItem(String id) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _items.removeWhere((item) => item.id == id);
+    final db = await DatabaseHelper.database;
+    await db.delete(
+      DatabaseHelper.tableWatchlist,
+      where: '${DatabaseHelper.columnId} = ?',
+      whereArgs: [id],
+    );
   }
 
   @override
   Future<WatchlistItemDto> toggleWatched(String id) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    final index = _items.indexWhere((item) => item.id == id);
-    if (index != -1) {
-      final item = _items[index];
-      final updatedItem = WatchlistItemDto(
-        id: item.id,
-        title: item.title,
-        watched: !item.watched,
-        imageUrl: item.imageUrl,
-      );
-      _items[index] = updatedItem;
-      return updatedItem;
+    final db = await DatabaseHelper.database;
+
+    // Get current item
+    final List<Map<String, dynamic>> maps = await db.query(
+      DatabaseHelper.tableWatchlist,
+      where: '${DatabaseHelper.columnId} = ?',
+      whereArgs: [id],
+    );
+
+    if (maps.isEmpty) {
+      throw Exception('Item not found');
     }
-    throw Exception('Item not found');
+
+    final currentItem = WatchlistItemDto.fromMap(maps.first);
+    final updatedItem = WatchlistItemDto(
+      id: currentItem.id,
+      title: currentItem.title,
+      watched: !currentItem.watched,
+      imageUrl: currentItem.imageUrl,
+    );
+
+    await db.update(
+      DatabaseHelper.tableWatchlist,
+      updatedItem.toMap(),
+      where: '${DatabaseHelper.columnId} = ?',
+      whereArgs: [id],
+    );
+
+    return updatedItem;
   }
 
   @override
   Future<void> clearAllItems() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _items.clear();
+    final db = await DatabaseHelper.database;
+    await db.delete(DatabaseHelper.tableWatchlist);
   }
 
   @override
   Future<void> clearWatchedItems() async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _items.removeWhere((item) => item.watched);
+    final db = await DatabaseHelper.database;
+    await db.delete(
+      DatabaseHelper.tableWatchlist,
+      where: '${DatabaseHelper.columnWatched} = ?',
+      whereArgs: [1],
+    );
   }
 }

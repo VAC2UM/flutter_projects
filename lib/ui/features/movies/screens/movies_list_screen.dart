@@ -80,6 +80,7 @@ class MoviesListScreen extends StatelessWidget {
                 return MovieTile(
                   movie: movie,
                   onTap: () => context.push('/movies/details', extra: movie),
+                  onDelete: () => _showDeleteDialog(context, movie.id),
                 );
               },
             );
@@ -93,6 +94,36 @@ class MoviesListScreen extends StatelessWidget {
         backgroundColor: themeState.currentTheme.colorScheme.primary,
         foregroundColor: themeState.currentTheme.colorScheme.onPrimary,
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showDeleteDialog(BuildContext context, String movieId) {
+    final themeState = ThemeState.of(context);
+    final moviesBloc = context.read<MoviesBloc>();
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Удалить фильм?'),
+        content: const Text(
+          'Вы уверены, что хотите удалить этот фильм? Это действие нельзя отменить.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Отмена'),
+          ),
+          TextButton(
+            onPressed: () {
+              moviesBloc.add(DeleteMovieEvent(movieId));
+              Navigator.of(dialogContext).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: themeState.currentTheme.colorScheme.error,
+            ),
+            child: const Text('Удалить'),
+          ),
+        ],
       ),
     );
   }

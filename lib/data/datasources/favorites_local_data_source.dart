@@ -1,4 +1,6 @@
 import '../dto/favorite_dto.dart';
+import '../../../shared/data/database_helper.dart';
+import 'package:sqflite/sqflite.dart';
 
 abstract class FavoritesLocalDataSource {
   Future<List<FavoriteDto>> getFavorites();
@@ -7,24 +9,36 @@ abstract class FavoritesLocalDataSource {
 }
 
 class FavoritesLocalDataSourceImpl implements FavoritesLocalDataSource {
-  final List<FavoriteDto> _favorites = [];
-
   @override
   Future<List<FavoriteDto>> getFavorites() async {
-    await Future.delayed(const Duration(milliseconds: 500));
-    return List.from(_favorites);
+    final db = await DatabaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      DatabaseHelper.tableFavorites,
+    );
+
+    return List.generate(maps.length, (i) {
+      return FavoriteDto.fromMap(maps[i]);
+    });
   }
 
   @override
   Future<FavoriteDto> addFavorite(FavoriteDto favorite) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _favorites.add(favorite);
+    final db = await DatabaseHelper.database;
+    await db.insert(
+      DatabaseHelper.tableFavorites,
+      favorite.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
     return favorite;
   }
 
   @override
   Future<void> deleteFavorite(String id) async {
-    await Future.delayed(const Duration(milliseconds: 300));
-    _favorites.removeWhere((fav) => fav.id == id);
+    final db = await DatabaseHelper.database;
+    await db.delete(
+      DatabaseHelper.tableFavorites,
+      where: '${DatabaseHelper.columnId} = ?',
+      whereArgs: [id],
+    );
   }
 }

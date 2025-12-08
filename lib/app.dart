@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_projects/ui/features/auth/delegates/auth_cubit.dart';
+import 'package:flutter_projects/ui/features/auth/delegates/auth_state.dart';
 import 'package:flutter_projects/ui/features/directors/screens/directors_screen.dart';
 import 'package:flutter_projects/ui/features/profile/screens/edit_profile_screen.dart';
 import 'package:flutter_projects/ui/features/profile/screens/profile_screen.dart';
@@ -35,13 +37,55 @@ import 'package:flutter_projects/ui/features/watchlist/delegates/watchlist_event
 import 'ui/shared/app_theme.dart';
 import 'ui/shared/theme_state.dart';
 
-final GoRouter _router = GoRouter(
+class _AuthNotifier extends ChangeNotifier {
+  final AuthCubit _authCubit;
+  late final StreamSubscription _subscription;
+
+  _AuthNotifier(this._authCubit) {
+    _subscription = _authCubit.stream.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter createRouter(AuthCubit authCubit) {
+  return GoRouter(
   initialLocation: '/auth',
+    refreshListenable: _AuthNotifier(authCubit),
+    redirect: (context, state) {
+      final authState = authCubit.state;
+      final isAuth = authState.isAuthenticated;
+      final isGoingToAuth = state.matchedLocation == '/auth';
+
+      // Если пользователь авторизован и пытается зайти на страницу авторизации - перенаправляем на главную
+      if (isAuth && isGoingToAuth) {
+        return '/main';
+      }
+
+      // Если пользователь не авторизован и пытается зайти не на страницу авторизации - перенаправляем на авторизацию
+      if (!isAuth && !isGoingToAuth) {
+        return '/auth';
+      }
+
+      return null; // Разрешаем навигацию
+    },
   routes: [
     GoRoute(
       path: '/auth',
       name: 'auth',
-      builder: (context, state) => const AuthScreen(),
+        builder: (context, state) {
+          // Передаем AuthCubit через extra
+          return BlocProvider.value(
+            value: authCubit,
+            child: const AuthScreen(),
+          );
+        },
     ),
 
     GoRoute(
@@ -69,7 +113,10 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final bloc = locator<MoviesBloc>();
         bloc.add(LoadMovies());
-        return BlocProvider.value(value: bloc, child: const MoviesListScreen());
+          return BlocProvider.value(
+            value: bloc,
+            child: const MoviesListScreen(),
+          );
       },
     ),
     GoRoute(
@@ -96,7 +143,10 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final bloc = locator<FavoritesBloc>();
         bloc.add(LoadFavorites());
-        return BlocProvider.value(value: bloc, child: const FavoritesScreen());
+          return BlocProvider.value(
+            value: bloc,
+            child: const FavoritesScreen(),
+          );
       },
     ),
     GoRoute(
@@ -118,7 +168,10 @@ final GoRouter _router = GoRouter(
       builder: (context, state) {
         final bloc = locator<WatchlistBloc>();
         bloc.add(LoadWatchlist());
-        return BlocProvider.value(value: bloc, child: const WatchlistScreen());
+          return BlocProvider.value(
+            value: bloc,
+            child: const WatchlistScreen(),
+          );
       },
     ),
     GoRoute(
@@ -181,17 +234,13 @@ final GoRouter _router = GoRouter(
       path: '/reviews/add',
       name: 'addReview',
       builder: (context, state) {
-        final extra = state.extra;
-        return extra != null
-            ? BlocProvider.value(
-                value: extra as ReviewsCubit,
-                child: const AddReviewScreen(),
-              )
-            : const AddReviewScreen();
+          // ReviewsCubit будет создан в AddReviewScreen если нужно
+          return const AddReviewScreen();
       },
     ),
   ],
 );
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -201,14 +250,33 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  late final AuthCubit _authCubit;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+    _authCubit = AuthCubit();
+    _router = createRouter(_authCubit);
+  }
+
+  @override
+  void dispose() {
+    _authCubit.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => AuthCubit()),
+        BlocProvider.value(value: _authCubit),
         BlocProvider(create: (context) => SettingsCubit()),
       ],
-      child: BlocBuilder<SettingsCubit, SettingsState>(
+      child: BlocBuilder<AuthCubit, AuthState>(
+        bloc: _authCubit,
+        builder: (context, authState) {
+          return BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
           return ThemeState(
             isDarkMode: settingsState.isDarkMode,
@@ -223,6 +291,8 @@ class _MyAppState extends State<MyApp> {
               routerConfig: _router,
               debugShowCheckedModeBanner: false,
             ),
+              );
+            },
           );
         },
       ),

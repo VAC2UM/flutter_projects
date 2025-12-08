@@ -7,25 +7,45 @@ import '../delegates/reviews_state.dart';
 import '../widgets/review_tile.dart';
 import 'package:flutter_projects/ui/shared/theme_state.dart';
 import 'package:flutter_projects/ui/shared/empty_state.dart';
+import 'package:flutter_projects/shared/di/service_locator.dart';
 
 class ReviewsScreen extends StatelessWidget {
   const ReviewsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ReviewsCubit(),
+    return BlocProvider.value(
+      value: locator<ReviewsCubit>()..loadReviews(),
       child: const ReviewsView(),
     );
   }
 }
 
-class ReviewsView extends StatelessWidget {
+class ReviewsView extends StatefulWidget {
   const ReviewsView({super.key});
 
-  void _openAddReviewForm(BuildContext context) {
-    final cubit = context.read<ReviewsCubit>();
-    context.push('/reviews/add', extra: cubit);
+  @override
+  State<ReviewsView> createState() => _ReviewsViewState();
+}
+
+class _ReviewsViewState extends State<ReviewsView> {
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем отзывы при инициализации
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        context.read<ReviewsCubit>().loadReviews();
+      }
+    });
+  }
+
+  Future<void> _openAddReviewForm(BuildContext context) async {
+    await context.push('/reviews/add');
+    // Обновляем список после возврата с экрана добавления
+    if (mounted) {
+      context.read<ReviewsCubit>().loadReviews();
+    }
   }
 
   void _deleteReviewWithUndo(BuildContext context, Review review) {
@@ -114,23 +134,25 @@ class ReviewsView extends StatelessWidget {
               Expanded(
                 child: state.reviews.isEmpty
                     ? EmptyState(
-                  icon: Icons.reviews,
-                  title: 'Нет отзывов',
-                  subtitle: 'Добавьте свой первый отзыв на фильм',
-                  themeState: themeState,
-                )
+                        icon: Icons.reviews,
+                        title: 'Нет отзывов',
+                        subtitle: 'Добавьте свой первый отзыв на фильм',
+                        themeState: themeState,
+                      )
                     : ListView.separated(
-                  padding: const EdgeInsets.all(20.0),
-                  itemCount: state.reviews.length,
-                  separatorBuilder: (context, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final review = state.reviews[index];
-                    return ReviewTile(
-                      review: review,
-                      onDelete: () => _deleteReviewWithUndo(context, review),
-                    );
-                  },
-                ),
+                        padding: const EdgeInsets.all(20.0),
+                        itemCount: state.reviews.length,
+                        separatorBuilder: (context, _) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (context, index) {
+                          final review = state.reviews[index];
+                          return ReviewTile(
+                            review: review,
+                            onDelete: () =>
+                                _deleteReviewWithUndo(context, review),
+                          );
+                        },
+                      ),
               ),
             ],
           );
@@ -148,7 +170,8 @@ class ReviewsView extends StatelessWidget {
   Widget _buildStatistics(ReviewsState state, ThemeState themeState) {
     final totalReviews = state.reviews.length;
     final averageRating = totalReviews > 0
-        ? state.reviews.map((r) => r.rating).reduce((a, b) => a + b) / totalReviews
+        ? state.reviews.map((r) => r.rating).reduce((a, b) => a + b) /
+              totalReviews
         : 0;
 
     return Container(
@@ -159,19 +182,35 @@ class ReviewsView extends StatelessWidget {
         color: themeState.currentTheme.colorScheme.primaryContainer,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: themeState.currentTheme.colorScheme.outline.withOpacity(0.3)),
+          color: themeState.currentTheme.colorScheme.outline.withOpacity(0.3),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem('Всего отзывов', totalReviews.toString(), Icons.reviews, themeState),
-          _buildStatItem('Средняя оценка', averageRating.toStringAsFixed(1), Icons.star, themeState),
+          _buildStatItem(
+            'Всего отзывов',
+            totalReviews.toString(),
+            Icons.reviews,
+            themeState,
+          ),
+          _buildStatItem(
+            'Средняя оценка',
+            averageRating.toStringAsFixed(1),
+            Icons.star,
+            themeState,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, IconData icon, ThemeState themeState) {
+  Widget _buildStatItem(
+    String label,
+    String value,
+    IconData icon,
+    ThemeState themeState,
+  ) {
     return Column(
       children: [
         Icon(
@@ -192,7 +231,8 @@ class ReviewsView extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: themeState.currentTheme.colorScheme.onPrimaryContainer.withOpacity(0.8),
+            color: themeState.currentTheme.colorScheme.onPrimaryContainer
+                .withOpacity(0.8),
           ),
         ),
       ],

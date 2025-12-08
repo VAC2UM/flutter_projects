@@ -3,14 +3,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../delegates/reviews_cubit.dart';
 import '../delegates/reviews_state.dart';
+import '../../movies/delegates/movies_bloc.dart';
+import '../../movies/delegates/movies_state.dart';
+import '../../movies/delegates/movies_event.dart';
+import 'package:flutter_projects/domain/models/movie.dart';
 import 'package:flutter_projects/ui/shared/theme_state.dart';
+import 'package:flutter_projects/shared/di/service_locator.dart';
 
 class AddReviewScreen extends StatelessWidget {
   const AddReviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const AddReviewView();
+    return BlocProvider.value(
+      value: locator<MoviesBloc>()..add(LoadMovies()),
+      child: BlocProvider.value(
+        value: locator<ReviewsCubit>(),
+        child: const AddReviewView(),
+      ),
+    );
   }
 }
 
@@ -22,21 +33,45 @@ class AddReviewView extends StatefulWidget {
 }
 
 class _AddReviewViewState extends State<AddReviewView> {
-  final TextEditingController _movieTitleController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
   final TextEditingController _reviewTextController = TextEditingController();
-  final TextEditingController _moviePosterController = TextEditingController();
 
   int _rating = 3;
-  String _movieId = '';
+  Movie? _selectedMovie;
+  List<Movie> _filteredMovies = [];
+  bool _showMovieList = false;
 
-  void _submitReview(BuildContext context) {
-    final movieTitle = _movieTitleController.text.trim();
+  void _filterMovies(String query, List<Movie> movies) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredMovies = movies;
+      } else {
+        _filteredMovies = movies
+            .where(
+              (movie) =>
+                  movie.title.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+      _showMovieList = query.isNotEmpty && _filteredMovies.isNotEmpty;
+    });
+  }
+
+  void _selectMovie(Movie movie) {
+    setState(() {
+      _selectedMovie = movie;
+      _searchController.text = movie.title;
+      _showMovieList = false;
+    });
+  }
+
+  Future<void> _submitReview(BuildContext context) async {
     final reviewText = _reviewTextController.text.trim();
 
-    if (movieTitle.isEmpty || reviewText.isEmpty) {
+    if (_selectedMovie == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Заполните все обязательные поля'),
+          content: const Text('Выберите фильм'),
           backgroundColor: ThemeState.of(
             context,
           ).currentTheme.colorScheme.error,
@@ -45,25 +80,33 @@ class _AddReviewViewState extends State<AddReviewView> {
       return;
     }
 
-    if (_movieId.isEmpty) {
-      _movieId = DateTime.now().millisecondsSinceEpoch.toString();
+    if (reviewText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Введите текст отзыва'),
+          backgroundColor: ThemeState.of(
+            context,
+          ).currentTheme.colorScheme.error,
+        ),
+      );
+      return;
     }
 
-    context.read<ReviewsCubit>().addReview(
-      movieId: _movieId,
-      movieTitle: movieTitle,
+    await context.read<ReviewsCubit>().addReview(
+      movieId: _selectedMovie!.id,
+      movieTitle: _selectedMovie!.title,
       rating: _rating,
       text: reviewText,
-      moviePosterUrl: _moviePosterController.text.trim().isEmpty
-          ? null
-          : _moviePosterController.text.trim(),
+      moviePosterUrl: _selectedMovie!.imageUrl,
     );
 
+    if (context.mounted) {
     context.pop();
+    }
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Отзыв на "$movieTitle" добавлен'),
+        content: Text('Отзыв на "${_selectedMovie!.title}" добавлен'),
         backgroundColor: ThemeState.of(
           context,
         ).currentTheme.colorScheme.primary,
@@ -74,9 +117,8 @@ class _AddReviewViewState extends State<AddReviewView> {
 
   @override
   void dispose() {
-    _movieTitleController.dispose();
+    _searchController.dispose();
     _reviewTextController.dispose();
-    _moviePosterController.dispose();
     super.dispose();
   }
 
@@ -94,25 +136,125 @@ class _AddReviewViewState extends State<AddReviewView> {
           onPressed: () => context.pop(),
         ),
       ),
-      body: BlocBuilder<ReviewsCubit, ReviewsState>(
-        builder: (context, state) {
+      body: BlocBuilder<MoviesBloc, MoviesState>(
+        builder: (context, moviesState) {
+          return BlocBuilder<ReviewsCubit, ReviewsState>(
+            builder: (context, reviewsState) {
+              final List<Movie> movies = moviesState is MoviesLoaded
+                  ? List<Movie>.from(moviesState.movies)
+                  : [];
+
           return Padding(
             padding: const EdgeInsets.all(20.0),
             child: SingleChildScrollView(
               child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                      Text(
+                        'Выберите фильм *',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: themeState.currentTheme.colorScheme.onSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
                   TextField(
-                    controller: _movieTitleController,
+                        controller: _searchController,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
-                      labelText: 'Название фильма *',
+                          labelText: 'Поиск фильма',
                       prefixIcon: Icon(
-                        Icons.movie,
+                            Icons.search,
                         color: themeState.currentTheme.colorScheme.primary,
                       ),
                       hintText: 'Введите название фильма',
-                    ),
-                  ),
+                          suffixIcon: _selectedMovie != null
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedMovie = null;
+                                      _searchController.clear();
+                                      _showMovieList = false;
+                                    });
+                                  },
+                                )
+                              : null,
+                        ),
+                        onChanged: (value) => _filterMovies(value, movies),
+                        onTap: () {
+                          if (_searchController.text.isEmpty) {
+                            setState(() {
+                              _filteredMovies = movies;
+                              _showMovieList = movies.isNotEmpty;
+                            });
+                          }
+                        },
+                      ),
+                      if (_showMovieList && _filteredMovies.isNotEmpty)
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          margin: const EdgeInsets.only(top: 8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: themeState.currentTheme.colorScheme.outline
+                                  .withOpacity(0.3),
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: _filteredMovies.length,
+                            itemBuilder: (context, index) {
+                              final movie = _filteredMovies[index];
+                              return ListTile(
+                                leading: const Icon(Icons.movie),
+                                title: Text(movie.title),
+                                subtitle: movie.year != null
+                                    ? Text('${movie.year}')
+                                    : null,
+                                onTap: () => _selectMovie(movie),
+                              );
+                            },
+                          ),
+                        ),
+                      if (_selectedMovie != null) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: themeState
+                                .currentTheme
+                                .colorScheme
+                                .primaryContainer
+                                .withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color:
+                                    themeState.currentTheme.colorScheme.primary,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Выбран: ${_selectedMovie!.title}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: themeState
+                                        .currentTheme
+                                        .colorScheme
+                                        .primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                   const SizedBox(height: 24),
                   _buildRatingSection(themeState),
                   const SizedBox(height: 24),
@@ -126,25 +268,12 @@ class _AddReviewViewState extends State<AddReviewView> {
                       hintText: 'Напишите ваш отзыв на фильм...',
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: _moviePosterController,
-                    decoration: InputDecoration(
-                      border: const OutlineInputBorder(),
-                      labelText: 'URL постера (опционально)',
-                      prefixIcon: Icon(
-                        Icons.image,
-                        color: themeState.currentTheme.colorScheme.primary,
-                      ),
-                      hintText: 'https://example.com/poster.jpg',
-                    ),
-                  ),
                   const SizedBox(height: 30),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
                     child: ElevatedButton(
-                      onPressed: state.isSubmitting
+                          onPressed: reviewsState.isSubmitting
                           ? null
                           : () => _submitReview(context),
                       style: ElevatedButton.styleFrom(
@@ -153,11 +282,13 @@ class _AddReviewViewState extends State<AddReviewView> {
                         foregroundColor:
                             themeState.currentTheme.colorScheme.onPrimary,
                       ),
-                      child: state.isSubmitting
+                          child: reviewsState.isSubmitting
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                             )
                           : const Text(
                               'Добавить отзыв',
@@ -168,6 +299,8 @@ class _AddReviewViewState extends State<AddReviewView> {
                 ],
               ),
             ),
+              );
+            },
           );
         },
       ),

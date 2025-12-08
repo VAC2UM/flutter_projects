@@ -1,32 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'settings_state.dart';
+import '../../../../shared/data/preferences_helper.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   SettingsCubit() : super(const SettingsState()) {
     _loadSettings();
   }
 
-  void _loadSettings() {
+  Future<void> _loadSettings() async {
     emit(state.copyWith(isLoading: true));
 
-    Future.delayed(const Duration(milliseconds: 300), () {
-      try {
-        final initialSettings = SettingsState(
-          isDarkMode: false,
-          notificationsEnabled: true,
-          isLoading: false,
-        );
+    try {
+      final isDarkMode = await PreferencesHelper.getDarkMode();
+      final notificationsEnabled =
+          await PreferencesHelper.getNotificationsEnabled();
 
-        emit(initialSettings);
-      } catch (e) {
-        emit(
-          state.copyWith(
-            isLoading: false,
-            error: 'Ошибка загрузки настроек: $e',
-          ),
-        );
-      }
-    });
+      final loadedSettings = SettingsState(
+        isDarkMode: isDarkMode,
+        notificationsEnabled: notificationsEnabled,
+        isLoading: false,
+      );
+
+      emit(loadedSettings);
+    } catch (e) {
+      emit(
+        state.copyWith(isLoading: false, error: 'Ошибка загрузки настроек: $e'),
+      );
+    }
   }
 
   void toggleTheme() {
@@ -64,11 +64,19 @@ class SettingsCubit extends Cubit<SettingsState> {
     emit(state.copyWith(error: null));
   }
 
-  void _saveThemePreference(bool isDarkMode) {
-    print('Сохранена тема: ${isDarkMode ? "тёмная" : "светлая"}');
+  Future<void> _saveThemePreference(bool isDarkMode) async {
+    try {
+      await PreferencesHelper.setDarkMode(isDarkMode);
+    } catch (e) {
+      emit(state.copyWith(error: 'Ошибка сохранения темы: $e'));
+    }
   }
 
-  void _saveNotificationsPreference(bool enabled) {
-    print('Уведомления: ${enabled ? "включены" : "выключены"}');
+  Future<void> _saveNotificationsPreference(bool enabled) async {
+    try {
+      await PreferencesHelper.setNotificationsEnabled(enabled);
+    } catch (e) {
+      emit(state.copyWith(error: 'Ошибка сохранения настроек уведомлений: $e'));
+    }
   }
 }

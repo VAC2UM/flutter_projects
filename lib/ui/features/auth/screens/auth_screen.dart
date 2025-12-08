@@ -11,10 +11,8 @@ class AuthScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => AuthCubit(),
-      child: const AuthView(),
-    );
+    // AuthCubit уже предоставлен через BlocProvider.value в app.dart
+    return const AuthView();
   }
 }
 
@@ -43,7 +41,8 @@ class _AuthViewState extends State<AuthView> {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state.isAuthenticated) {
-          context.pushReplacement('/main');
+          // Используем GoRouter для перенаправления
+          context.go('/main');
         }
       },
       child: Scaffold(

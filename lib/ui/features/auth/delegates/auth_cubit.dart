@@ -1,19 +1,31 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_state.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
+import 'package:flutter_projects/shared/data/preferences_helper.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthState()) {
     _checkInitialAuth();
   }
 
-  void _checkInitialAuth() {
+  Future<void> _checkInitialAuth() async {
     try {
-      if (locator.isRegistered<AppStateService>()) {
-        final appState = locator<AppStateService>();
-        final currentUser = appState.currentUser;
-        if (currentUser.isNotEmpty) {
-          emit(AuthState(isAuthenticated: true, currentUser: currentUser));
+      final savedUser = await PreferencesHelper.getCurrentUser();
+
+      if (savedUser != null && savedUser.isNotEmpty) {
+        if (locator.isRegistered<AppStateService>()) {
+          final appState = locator<AppStateService>();
+          appState.setCurrentUser(savedUser);
+        }
+
+        emit(AuthState(isAuthenticated: true, currentUser: savedUser));
+      } else {
+        if (locator.isRegistered<AppStateService>()) {
+          final appState = locator<AppStateService>();
+          final currentUser = appState.currentUser;
+          if (currentUser.isNotEmpty) {
+            emit(AuthState(isAuthenticated: true, currentUser: currentUser));
+          }
         }
       }
     } catch (e) {
@@ -24,8 +36,10 @@ class AuthCubit extends Cubit<AuthState> {
   void login(String login, String password) {
     emit(state.copyWith(isLoading: true, error: null));
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () async {
       if (login == 'admin' && password == '12345') {
+        await PreferencesHelper.setCurrentUser(login);
+
         if (locator.isRegistered<AppStateService>()) {
           final appState = locator<AppStateService>();
           appState.setCurrentUser(login);
@@ -46,7 +60,9 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
-  void logout() {
+  Future<void> logout() async {
+    await PreferencesHelper.clearCurrentUser();
+
     if (locator.isRegistered<AppStateService>()) {
       final appState = locator<AppStateService>();
       appState.setCurrentUser('');
