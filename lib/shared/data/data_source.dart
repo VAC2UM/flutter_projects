@@ -1,8 +1,8 @@
-import 'package:flutter_projects/features/actors/actors_feature.dart';
-import 'package:flutter_projects/features/movies/models/movie.dart';
-import 'package:flutter_projects/features/profile/models/user.dart';
-import 'package:flutter_projects/features/studios/models/studio.dart';
-import 'package:flutter_projects/features/directors/models/director.dart';
+import 'package:flutter_projects/domain/models/actor.dart';
+import 'package:flutter_projects/domain/models/movie.dart';
+import 'package:flutter_projects/domain/models/user.dart';
+import 'package:flutter_projects/domain/models/studio.dart';
+import 'package:flutter_projects/domain/models/director.dart';
 
 class AppData {
   final List<Actor> actors;
@@ -25,9 +25,23 @@ class AppData {
 
   factory AppData.initial() {
     final actors = [
-      Actor(id: '1', name: 'Юра Борисов', imageUrl: 'https://static1.tgstat.ru/channels/_0/66/66d1a80fb5e8f400a2ddd816cc92ad95.jpg'),
-      Actor(id: '2', name: 'Хоакин Феникс', imageUrl: 'https://images.iptv.rt.ru/images/cpt8sk3ir4sqiatbcj90.jpg'),
-      Actor(id: '3', name: 'Брайан Крэнстон', imageUrl: 'https://avatars.mds.yandex.net/i?id=ad1cff5319fcd4bc26ae7ab9aa63e091_l-5387132-images-thumbs&n=13'),
+      Actor(
+        id: '1',
+        name: 'Юра Борисов',
+        imageUrl:
+            'https://static1.tgstat.ru/channels/_0/66/66d1a80fb5e8f400a2ddd816cc92ad95.jpg',
+      ),
+      Actor(
+        id: '2',
+        name: 'Хоакин Феникс',
+        imageUrl: 'https://images.iptv.rt.ru/images/cpt8sk3ir4sqiatbcj90.jpg',
+      ),
+      Actor(
+        id: '3',
+        name: 'Брайан Крэнстон',
+        imageUrl:
+            'https://avatars.mds.yandex.net/i?id=ad1cff5319fcd4bc26ae7ab9aa63e091_l-5387132-images-thumbs&n=13',
+      ),
     ];
 
     final movies = [
@@ -35,7 +49,8 @@ class AppData {
         id: '1',
         title: 'Мстители: Финал',
         rating: 8,
-        imageUrl: 'https://a.ltrbxd.com/resized/film-poster/2/2/6/6/6/0/226660-avengers-endgame-0-2000-0-3000-crop.jpg?v=d4006bfd5e',
+        imageUrl:
+            'https://a.ltrbxd.com/resized/film-poster/2/2/6/6/6/0/226660-avengers-endgame-0-2000-0-3000-crop.jpg?v=d4006bfd5e',
         director: 'Братья Руссо',
         year: 2019,
         genre: 'Фантастика',
@@ -44,7 +59,8 @@ class AppData {
         id: '2',
         title: 'Кентавр',
         rating: 7,
-        imageUrl: 'https://a.ltrbxd.com/resized/film-poster/1/0/2/9/9/1/0/1029910-centaur-2023-0-2000-0-3000-crop.jpg?v=fe28759575',
+        imageUrl:
+            'https://a.ltrbxd.com/resized/film-poster/1/0/2/9/9/1/0/1029910-centaur-2023-0-2000-0-3000-crop.jpg?v=fe28759575',
         director: 'Кирилл Кемниц',
         year: 2023,
         genre: 'Драма',
@@ -55,14 +71,16 @@ class AppData {
       Studio(
         id: '1',
         name: 'Marvel Studios',
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Marvel_Logo.svg/1200px-Marvel_Logo.svg.png',
+        logoUrl:
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Marvel_Logo.svg/1200px-Marvel_Logo.svg.png',
         foundedYear: 1993,
         country: 'США',
       ),
       Studio(
         id: '2',
         name: 'Warner Bros.',
-        logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Warner_Bros_logo.svg/1965px-Warner_Bros_logo.svg.png',
+        logoUrl:
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Warner_Bros_logo.svg/1965px-Warner_Bros_logo.svg.png',
         foundedYear: 1923,
         country: 'США',
       ),
@@ -72,14 +90,16 @@ class AppData {
       Director(
         id: '1',
         name: 'Кристофер Нолан',
-        imageUrl: 'https://avatars.mds.yandex.net/i?id=4c8a58773f24c8ce6cf949d86089829493cfb322-4554202-images-thumbs&n=13',
+        imageUrl:
+            'https://avatars.mds.yandex.net/i?id=4c8a58773f24c8ce6cf949d86089829493cfb322-4554202-images-thumbs&n=13',
         birthYear: 1970,
         country: 'Великобритания',
       ),
       Director(
         id: '2',
         name: 'Квентин Тарантино',
-        imageUrl: 'https://avatars.mds.yandex.net/i?id=184f84417630a5ad4f3db5f161b14d15-4443391-images-thumbs&n=13',
+        imageUrl:
+            'https://avatars.mds.yandex.net/i?id=184f84417630a5ad4f3db5f161b14d15-4443391-images-thumbs&n=13',
         birthYear: 1963,
         country: 'США',
       ),
@@ -89,7 +109,8 @@ class AppData {
       id: '1',
       name: 'Иван Петров',
       email: 'ivan.petrov@example.com',
-      avatarUrl: 'https://i.pinimg.com/originals/d7/92/04/d79204dc601b615a329ea4c679adb481.jpg',
+      avatarUrl:
+          'https://i.pinimg.com/originals/d7/92/04/d79204dc601b615a329ea4c679adb481.jpg',
       joinDate: DateTime(2025, 11, 14),
     );
 

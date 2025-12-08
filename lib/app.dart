@@ -1,35 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_projects/features/auth/cubit/auth_cubit.dart';
-import 'package:flutter_projects/features/directors/screens/directors_screen.dart';
-import 'package:flutter_projects/features/favorites/cubit/favorites_cubit.dart';
-import 'package:flutter_projects/features/movies/models/movie.dart';
-import 'package:flutter_projects/features/profile/screens/edit_profile_screen.dart';
-import 'package:flutter_projects/features/profile/screens/profile_screen.dart';
-import 'package:flutter_projects/features/reviews/screens/add_review_screen.dart';
-import 'package:flutter_projects/features/reviews/screens/reviews_screen.dart';
-import 'package:flutter_projects/features/settings/cubit/settings_cubit.dart';
-import 'package:flutter_projects/features/settings/state/settings_state.dart';
-import 'package:flutter_projects/features/studios/screens/studios_screen.dart';
-import 'package:flutter_projects/features/watchlist/cubit/watchlist_cubit.dart';
-import 'package:flutter_projects/features/watchlist/state/watchlist_container.dart';
-import 'package:flutter_projects/shared/data/data_source.dart';
+import 'package:flutter_projects/ui/features/auth/delegates/auth_cubit.dart';
+import 'package:flutter_projects/ui/features/directors/screens/directors_screen.dart';
+import 'package:flutter_projects/ui/features/profile/screens/edit_profile_screen.dart';
+import 'package:flutter_projects/ui/features/profile/screens/profile_screen.dart';
+import 'package:flutter_projects/ui/features/reviews/screens/add_review_screen.dart';
+import 'package:flutter_projects/ui/features/reviews/screens/reviews_screen.dart';
+import 'package:flutter_projects/ui/features/reviews/delegates/reviews_cubit.dart';
+import 'package:flutter_projects/ui/features/profile/delegates/profile_cubit.dart';
+import 'package:flutter_projects/ui/features/settings/delegates/settings_cubit.dart';
+import 'package:flutter_projects/ui/features/settings/delegates/settings_state.dart';
+import 'package:flutter_projects/ui/features/studios/screens/studios_screen.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_projects/features/auth/screens/auth_screen.dart';
-import 'package:flutter_projects/features/main/screens/main_menu_screen.dart';
-import 'package:flutter_projects/features/actors/screens/actors_screen.dart';
-import 'package:flutter_projects/features/movies/screens/movies_list_screen.dart';
-import 'package:flutter_projects/features/favorites/screens/favorites_screen.dart';
-import 'package:flutter_projects/features/watchlist/screens/watchlist_screen.dart';
-import 'package:flutter_projects/features/settings/screens/settings_screen.dart';
-import 'package:flutter_projects/features/actors/screens/add_actor_screen.dart';
-import 'package:flutter_projects/features/movies/screens/add_movie_screen.dart';
-import 'package:flutter_projects/features/favorites/screens/add_favorite_screen.dart';
-import 'package:flutter_projects/features/watchlist/screens/add_watchlist_screen.dart';
-import 'package:flutter_projects/features/movies/screens/movie_details_screen.dart';
-import 'shared/app_theme.dart';
-import 'shared/theme/theme_state.dart';
+import 'package:flutter_projects/ui/features/auth/screens/auth_screen.dart';
+import 'package:flutter_projects/ui/features/main/screens/main_menu_screen.dart';
+import 'package:flutter_projects/ui/features/actors/screens/actors_screen.dart';
+import 'package:flutter_projects/ui/features/movies/screens/movies_list_screen.dart';
+import 'package:flutter_projects/ui/features/favorites/screens/favorites_screen.dart';
+import 'package:flutter_projects/ui/features/watchlist/screens/watchlist_screen.dart';
+import 'package:flutter_projects/ui/features/settings/screens/settings_screen.dart';
+import 'package:flutter_projects/ui/features/actors/screens/add_actor_screen.dart';
+import 'package:flutter_projects/ui/features/movies/screens/add_movie_screen.dart';
+import 'package:flutter_projects/ui/features/favorites/screens/add_favorite_screen.dart';
+import 'package:flutter_projects/ui/features/watchlist/screens/add_watchlist_screen.dart';
+import 'package:flutter_projects/ui/features/movies/screens/movie_details_screen.dart';
+import 'package:flutter_projects/domain/models/movie.dart';
+import 'package:flutter_projects/ui/features/movies/delegates/movies_bloc.dart';
+import 'package:flutter_projects/ui/features/movies/delegates/movies_event.dart';
+import 'package:flutter_projects/ui/features/favorites/delegates/favorites_bloc.dart';
+import 'package:flutter_projects/ui/features/favorites/delegates/favorites_event.dart';
+import 'package:flutter_projects/ui/features/watchlist/delegates/watchlist_bloc.dart';
+import 'package:flutter_projects/ui/features/watchlist/delegates/watchlist_event.dart';
+import 'ui/shared/app_theme.dart';
+import 'ui/shared/theme_state.dart';
 
 final GoRouter _router = GoRouter(
   initialLocation: '/auth',
@@ -62,12 +66,19 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/movies',
       name: 'movies',
-      builder: (context, state) => MoviesListScreen(movies: locator<AppData>().movies),
+      builder: (context, state) {
+        final bloc = locator<MoviesBloc>();
+        bloc.add(LoadMovies());
+        return BlocProvider.value(value: bloc, child: const MoviesListScreen());
+      },
     ),
     GoRoute(
       path: '/movies/add',
       name: 'addMovie',
-      builder: (context, state) => const AddMovieScreen(),
+      builder: (context, state) {
+        final bloc = locator<MoviesBloc>();
+        return BlocProvider.value(value: bloc, child: const AddMovieScreen());
+      },
     ),
     GoRoute(
       path: '/movies/details',
@@ -82,24 +93,44 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/favorites',
       name: 'favorites',
-      builder: (context, state) => const FavoritesScreen(),
+      builder: (context, state) {
+        final bloc = locator<FavoritesBloc>();
+        bloc.add(LoadFavorites());
+        return BlocProvider.value(value: bloc, child: const FavoritesScreen());
+      },
     ),
     GoRoute(
       path: '/favorites/add',
       name: 'addFavorite',
-      builder: (context, state) => const AddFavoriteScreen(),
+      builder: (context, state) {
+        final bloc = locator<FavoritesBloc>();
+        return BlocProvider.value(
+          value: bloc,
+          child: const AddFavoriteScreen(),
+        );
+      },
     ),
 
     // Watchlist Section
     GoRoute(
       path: '/watchlist',
       name: 'watchlist',
-      builder: (context, state) => const WatchlistScreen(),
+      builder: (context, state) {
+        final bloc = locator<WatchlistBloc>();
+        bloc.add(LoadWatchlist());
+        return BlocProvider.value(value: bloc, child: const WatchlistScreen());
+      },
     ),
     GoRoute(
       path: '/watchlist/add',
       name: 'addWatchlist',
-      builder: (context, state) => const AddWatchlistScreen(),
+      builder: (context, state) {
+        final bloc = locator<WatchlistBloc>();
+        return BlocProvider.value(
+          value: bloc,
+          child: const AddWatchlistScreen(),
+        );
+      },
     ),
 
     // Settings Section
@@ -118,7 +149,15 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/profile/edit',
       name: 'editProfile',
-      builder: (context, state) => const EditProfileScreen(),
+      builder: (context, state) {
+        final extra = state.extra;
+        return extra != null
+            ? BlocProvider.value(
+                value: extra as ProfileCubit,
+                child: const EditProfileScreen(),
+              )
+            : const EditProfileScreen();
+      },
     ),
 
     GoRoute(
@@ -141,7 +180,15 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/reviews/add',
       name: 'addReview',
-      builder: (context, state) => const AddReviewScreen(),
+      builder: (context, state) {
+        final extra = state.extra;
+        return extra != null
+            ? BlocProvider.value(
+                value: extra as ReviewsCubit,
+                child: const AddReviewScreen(),
+              )
+            : const AddReviewScreen();
+      },
     ),
   ],
 );
@@ -160,8 +207,6 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => SettingsCubit()),
-        BlocProvider(create: (context) => FavoritesCubit()),
-        BlocProvider(create: (context) => WatchlistCubit()),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
@@ -172,7 +217,9 @@ class _MyAppState extends State<MyApp> {
             },
             child: MaterialApp.router(
               title: 'Фильмотека',
-              theme: settingsState.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+              theme: settingsState.isDarkMode
+                  ? AppTheme.darkTheme
+                  : AppTheme.lightTheme,
               routerConfig: _router,
               debugShowCheckedModeBanner: false,
             ),
