@@ -100,11 +100,12 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
     String? category,
   }) async {
     try {
+      final countryParam = country ?? 'us';
+      final categoryParam =
+          category ?? 'entertainment';
+
       final uri = Uri.parse('$baseUrl/top-headlines').replace(
-        queryParameters: {
-          if (category != null) 'category': category,
-          if (country != null) 'country': country,
-        },
+        queryParameters: {'country': countryParam, 'category': categoryParam},
       );
       final response = await _getWithTimeout(uri);
 
