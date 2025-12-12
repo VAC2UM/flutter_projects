@@ -69,6 +69,24 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       'color': Colors.grey,
       'route': '/settings',
     },
+    {
+      'title': 'Популярные фильмы',
+      'icon': Icons.trending_up,
+      'color': Colors.deepPurple,
+      'route': '/tmdb-movies/popular',
+    },
+    {
+      'title': 'Поиск фильмов',
+      'icon': Icons.search,
+      'color': Colors.cyan,
+      'route': '/tmdb-movies/search',
+    },
+    {
+      'title': 'Новости о кино',
+      'icon': Icons.newspaper,
+      'color': Colors.brown,
+      'route': '/news',
+    },
   ];
 
   Future<void> _logout(BuildContext context) async {

@@ -33,6 +33,14 @@ import 'package:flutter_projects/ui/features/favorites/delegates/favorites_bloc.
 import 'package:flutter_projects/ui/features/favorites/delegates/favorites_event.dart';
 import 'package:flutter_projects/ui/features/watchlist/delegates/watchlist_bloc.dart';
 import 'package:flutter_projects/ui/features/watchlist/delegates/watchlist_event.dart';
+import 'package:flutter_projects/ui/features/tmdb_movies/screens/popular_movies_screen.dart';
+import 'package:flutter_projects/ui/features/tmdb_movies/screens/search_movies_screen.dart';
+import 'package:flutter_projects/ui/features/tmdb_movies/screens/tmdb_movie_details_screen.dart';
+import 'package:flutter_projects/ui/features/tmdb_movies/delegates/tmdb_movies_bloc.dart';
+import 'package:flutter_projects/ui/features/tmdb_movies/delegates/tmdb_movies_event.dart';
+import 'package:flutter_projects/domain/models/tmdb_movie.dart';
+import 'package:flutter_projects/ui/features/news/screens/news_screen.dart';
+import 'package:flutter_projects/ui/features/news/delegates/news_cubit.dart';
 import 'ui/shared/app_theme.dart';
 import 'ui/shared/theme_state.dart';
 
@@ -55,7 +63,7 @@ class _AuthNotifier extends ChangeNotifier {
 
 GoRouter createRouter(AuthCubit authCubit) {
   return GoRouter(
-  initialLocation: '/auth',
+    initialLocation: '/auth',
     refreshListenable: _AuthNotifier(authCubit),
     redirect: (context, state) {
       final authState = authCubit.state;
@@ -74,10 +82,10 @@ GoRouter createRouter(AuthCubit authCubit) {
 
       return null; // Разрешаем навигацию
     },
-  routes: [
-    GoRoute(
-      path: '/auth',
-      name: 'auth',
+    routes: [
+      GoRoute(
+        path: '/auth',
+        name: 'auth',
         builder: (context, state) {
           // Передаем AuthCubit через extra
           return BlocProvider.value(
@@ -85,160 +93,207 @@ GoRouter createRouter(AuthCubit authCubit) {
             child: const AuthScreen(),
           );
         },
-    ),
+      ),
 
-    GoRoute(
-      path: '/main',
-      name: 'main',
-      builder: (context, state) => const MainMenuScreen(),
-    ),
+      GoRoute(
+        path: '/main',
+        name: 'main',
+        builder: (context, state) => const MainMenuScreen(),
+      ),
 
-    // Actors Section
-    GoRoute(
-      path: '/actors',
-      name: 'actors',
-      builder: (context, state) => const ActorsScreen(),
-    ),
-    GoRoute(
-      path: '/actors/add',
-      name: 'addActor',
-      builder: (context, state) => const AddActorScreen(),
-    ),
+      // Actors Section
+      GoRoute(
+        path: '/actors',
+        name: 'actors',
+        builder: (context, state) => const ActorsScreen(),
+      ),
+      GoRoute(
+        path: '/actors/add',
+        name: 'addActor',
+        builder: (context, state) => const AddActorScreen(),
+      ),
 
-    // Movies Section
-    GoRoute(
-      path: '/movies',
-      name: 'movies',
-      builder: (context, state) {
-        final bloc = locator<MoviesBloc>();
-        bloc.add(LoadMovies());
+      // Movies Section
+      GoRoute(
+        path: '/movies',
+        name: 'movies',
+        builder: (context, state) {
+          final bloc = locator<MoviesBloc>();
+          bloc.add(LoadMovies());
           return BlocProvider.value(
             value: bloc,
             child: const MoviesListScreen(),
           );
-      },
-    ),
-    GoRoute(
-      path: '/movies/add',
-      name: 'addMovie',
-      builder: (context, state) {
-        final bloc = locator<MoviesBloc>();
-        return BlocProvider.value(value: bloc, child: const AddMovieScreen());
-      },
-    ),
-    GoRoute(
-      path: '/movies/details',
-      name: 'movieDetails',
-      builder: (context, state) {
-        final movie = state.extra as Movie;
-        return MovieDetailsScreen(movie: movie);
-      },
-    ),
+        },
+      ),
+      GoRoute(
+        path: '/movies/add',
+        name: 'addMovie',
+        builder: (context, state) {
+          final bloc = locator<MoviesBloc>();
+          return BlocProvider.value(value: bloc, child: const AddMovieScreen());
+        },
+      ),
+      GoRoute(
+        path: '/movies/details',
+        name: 'movieDetails',
+        builder: (context, state) {
+          final movie = state.extra as Movie;
+          return MovieDetailsScreen(movie: movie);
+        },
+      ),
 
-    // Favorites Section
-    GoRoute(
-      path: '/favorites',
-      name: 'favorites',
-      builder: (context, state) {
-        final bloc = locator<FavoritesBloc>();
-        bloc.add(LoadFavorites());
+      // Favorites Section
+      GoRoute(
+        path: '/favorites',
+        name: 'favorites',
+        builder: (context, state) {
+          final bloc = locator<FavoritesBloc>();
+          bloc.add(LoadFavorites());
           return BlocProvider.value(
             value: bloc,
             child: const FavoritesScreen(),
           );
-      },
-    ),
-    GoRoute(
-      path: '/favorites/add',
-      name: 'addFavorite',
-      builder: (context, state) {
-        final bloc = locator<FavoritesBloc>();
-        return BlocProvider.value(
-          value: bloc,
-          child: const AddFavoriteScreen(),
-        );
-      },
-    ),
+        },
+      ),
+      GoRoute(
+        path: '/favorites/add',
+        name: 'addFavorite',
+        builder: (context, state) {
+          final bloc = locator<FavoritesBloc>();
+          return BlocProvider.value(
+            value: bloc,
+            child: const AddFavoriteScreen(),
+          );
+        },
+      ),
 
-    // Watchlist Section
-    GoRoute(
-      path: '/watchlist',
-      name: 'watchlist',
-      builder: (context, state) {
-        final bloc = locator<WatchlistBloc>();
-        bloc.add(LoadWatchlist());
+      // Watchlist Section
+      GoRoute(
+        path: '/watchlist',
+        name: 'watchlist',
+        builder: (context, state) {
+          final bloc = locator<WatchlistBloc>();
+          bloc.add(LoadWatchlist());
           return BlocProvider.value(
             value: bloc,
             child: const WatchlistScreen(),
           );
-      },
-    ),
-    GoRoute(
-      path: '/watchlist/add',
-      name: 'addWatchlist',
-      builder: (context, state) {
-        final bloc = locator<WatchlistBloc>();
-        return BlocProvider.value(
-          value: bloc,
-          child: const AddWatchlistScreen(),
-        );
-      },
-    ),
+        },
+      ),
+      GoRoute(
+        path: '/watchlist/add',
+        name: 'addWatchlist',
+        builder: (context, state) {
+          final bloc = locator<WatchlistBloc>();
+          return BlocProvider.value(
+            value: bloc,
+            child: const AddWatchlistScreen(),
+          );
+        },
+      ),
 
-    // Settings Section
-    GoRoute(
-      path: '/settings',
-      name: 'settings',
-      builder: (context, state) => const SettingsScreen(),
-    ),
+      // Settings Section
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const SettingsScreen(),
+      ),
 
-    // Profile Section
-    GoRoute(
-      path: '/profile',
-      name: 'profile',
-      builder: (context, state) => const ProfileScreen(),
-    ),
-    GoRoute(
-      path: '/profile/edit',
-      name: 'editProfile',
-      builder: (context, state) {
-        final extra = state.extra;
-        return extra != null
-            ? BlocProvider.value(
-                value: extra as ProfileCubit,
-                child: const EditProfileScreen(),
-              )
-            : const EditProfileScreen();
-      },
-    ),
+      // Profile Section
+      GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/profile/edit',
+        name: 'editProfile',
+        builder: (context, state) {
+          final extra = state.extra;
+          return extra != null
+              ? BlocProvider.value(
+                  value: extra as ProfileCubit,
+                  child: const EditProfileScreen(),
+                )
+              : const EditProfileScreen();
+        },
+      ),
 
-    GoRoute(
-      path: '/studios',
-      name: 'studios',
-      builder: (context, state) => const StudiosScreen(),
-    ),
+      GoRoute(
+        path: '/studios',
+        name: 'studios',
+        builder: (context, state) => const StudiosScreen(),
+      ),
 
-    GoRoute(
-      path: '/directors',
-      name: 'directors',
-      builder: (context, state) => const DirectorsScreen(),
-    ),
+      GoRoute(
+        path: '/directors',
+        name: 'directors',
+        builder: (context, state) => const DirectorsScreen(),
+      ),
 
-    GoRoute(
-      path: '/reviews',
-      name: 'reviews',
-      builder: (context, state) => const ReviewsScreen(),
-    ),
-    GoRoute(
-      path: '/reviews/add',
-      name: 'addReview',
-      builder: (context, state) {
+      GoRoute(
+        path: '/reviews',
+        name: 'reviews',
+        builder: (context, state) => const ReviewsScreen(),
+      ),
+      GoRoute(
+        path: '/reviews/add',
+        name: 'addReview',
+        builder: (context, state) {
           // ReviewsCubit будет создан в AddReviewScreen если нужно
           return const AddReviewScreen();
-      },
-    ),
-  ],
-);
+        },
+      ),
+
+      // TMDB Movies Section
+      GoRoute(
+        path: '/tmdb-movies/popular',
+        name: 'popularMovies',
+        builder: (context, state) {
+          final bloc = locator<TmdbMoviesBloc>();
+          bloc.add(LoadPopularMovies());
+          return BlocProvider.value(
+            value: bloc,
+            child: const PopularMoviesScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/tmdb-movies/search',
+        name: 'searchMovies',
+        builder: (context, state) {
+          final bloc = locator<TmdbMoviesBloc>();
+          return BlocProvider.value(
+            value: bloc,
+            child: const SearchMoviesScreen(),
+          );
+        },
+      ),
+      GoRoute(
+        path: '/tmdb-movies/details',
+        name: 'tmdbMovieDetails',
+        builder: (context, state) {
+          final movie = state.extra as TmdbMovie;
+          final bloc = locator<TmdbMoviesBloc>();
+          return BlocProvider.value(
+            value: bloc,
+            child: TmdbMovieDetailsScreen(movie: movie),
+          );
+        },
+      ),
+
+      // News Section
+      GoRoute(
+        path: '/news',
+        name: 'news',
+        builder: (context, state) {
+          final cubit = locator<NewsCubit>();
+          return BlocProvider.value(value: cubit, child: const NewsScreen());
+        },
+      ),
+    ],
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -276,20 +331,20 @@ class _MyAppState extends State<MyApp> {
         bloc: _authCubit,
         builder: (context, authState) {
           return BlocBuilder<SettingsCubit, SettingsState>(
-        builder: (context, settingsState) {
-          return ThemeState(
-            isDarkMode: settingsState.isDarkMode,
-            toggleTheme: () {
-              context.read<SettingsCubit>().toggleTheme();
-            },
-            child: MaterialApp.router(
-              title: 'Фильмотека',
-              theme: settingsState.isDarkMode
-                  ? AppTheme.darkTheme
-                  : AppTheme.lightTheme,
-              routerConfig: _router,
-              debugShowCheckedModeBanner: false,
-            ),
+            builder: (context, settingsState) {
+              return ThemeState(
+                isDarkMode: settingsState.isDarkMode,
+                toggleTheme: () {
+                  context.read<SettingsCubit>().toggleTheme();
+                },
+                child: MaterialApp.router(
+                  title: 'Фильмотека',
+                  theme: settingsState.isDarkMode
+                      ? AppTheme.darkTheme
+                      : AppTheme.lightTheme,
+                  routerConfig: _router,
+                  debugShowCheckedModeBanner: false,
+                ),
               );
             },
           );

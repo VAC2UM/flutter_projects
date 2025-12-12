@@ -27,6 +27,22 @@ import '../../ui/features/reviews/delegates/reviews_cubit.dart';
 import '../data/data_source.dart';
 import '../data/preferences_helper.dart';
 import '../data/database_helper.dart';
+import '../../data/datasources/tmdb_remote_data_source.dart';
+import '../../data/datasources/news_remote_data_source.dart';
+import '../../data/repositories/news_repository_impl.dart';
+import '../../domain/interfaces/news_repository.dart';
+import '../../domain/usecases/get_popular_movies.dart';
+import '../../domain/usecases/get_tmdb_movie_by_id.dart';
+import '../../domain/usecases/get_movie_credits.dart';
+import '../../domain/usecases/search_tmdb_movies.dart';
+import '../../domain/usecases/get_movie_recommendations.dart';
+import '../../domain/usecases/get_movies_news.dart';
+import '../../domain/usecases/get_top_headlines.dart';
+import '../../domain/usecases/search_news.dart';
+import '../../domain/usecases/get_news_by_source.dart';
+import '../../domain/usecases/get_news_by_date_range.dart';
+import '../../ui/features/tmdb_movies/delegates/tmdb_movies_bloc.dart';
+import '../../ui/features/news/delegates/news_cubit.dart';
 
 final GetIt locator = GetIt.instance;
 
@@ -64,10 +80,22 @@ Future<void> setupLocator() async {
   locator.registerLazySingleton<ReviewsLocalDataSource>(
     () => ReviewsLocalDataSourceImpl(),
   );
+  locator.registerLazySingleton<TmdbRemoteDataSource>(
+    () => TmdbRemoteDataSourceImpl(),
+  );
+  locator.registerLazySingleton<NewsRemoteDataSource>(
+    () => NewsRemoteDataSourceImpl(),
+  );
 
   // Repositories
   locator.registerLazySingleton<MoviesRepository>(
-    () => MoviesRepositoryImpl(locator<MoviesLocalDataSource>()),
+    () => MoviesRepositoryImpl(
+      locator<MoviesLocalDataSource>(),
+      locator<TmdbRemoteDataSource>(),
+    ),
+  );
+  locator.registerLazySingleton<NewsRepository>(
+    () => NewsRepositoryImpl(locator<NewsRemoteDataSource>()),
   );
   locator.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(locator<FavoritesLocalDataSource>()),
@@ -109,6 +137,36 @@ Future<void> setupLocator() async {
     () => ToggleWatched(locator<WatchlistRepository>()),
   );
 
+  // Use Cases - TMDB Movies
+  locator.registerLazySingleton(
+    () => GetPopularMovies(locator<MoviesRepository>()),
+  );
+  locator.registerLazySingleton(
+    () => GetTmdbMovieById(locator<MoviesRepository>()),
+  );
+  locator.registerLazySingleton(
+    () => GetMovieCredits(locator<MoviesRepository>()),
+  );
+  locator.registerLazySingleton(
+    () => SearchTmdbMovies(locator<MoviesRepository>()),
+  );
+  locator.registerLazySingleton(
+    () => GetMovieRecommendations(locator<MoviesRepository>()),
+  );
+
+  // Use Cases - News
+  locator.registerLazySingleton(() => GetMoviesNews(locator<NewsRepository>()));
+  locator.registerLazySingleton(
+    () => GetTopHeadlines(locator<NewsRepository>()),
+  );
+  locator.registerLazySingleton(() => SearchNews(locator<NewsRepository>()));
+  locator.registerLazySingleton(
+    () => GetNewsBySource(locator<NewsRepository>()),
+  );
+  locator.registerLazySingleton(
+    () => GetNewsByDateRange(locator<NewsRepository>()),
+  );
+
   // BLoCs - используем lazySingleton для сохранения состояния между экранами
   locator.registerLazySingleton(
     () => MoviesBloc(
@@ -135,6 +193,24 @@ Future<void> setupLocator() async {
     ),
   );
   locator.registerLazySingleton(() => ReviewsCubit());
+  locator.registerLazySingleton(
+    () => TmdbMoviesBloc(
+      getPopularMovies: locator<GetPopularMovies>(),
+      getTmdbMovieById: locator<GetTmdbMovieById>(),
+      getMovieCredits: locator<GetMovieCredits>(),
+      searchTmdbMovies: locator<SearchTmdbMovies>(),
+      getMovieRecommendations: locator<GetMovieRecommendations>(),
+    ),
+  );
+  locator.registerLazySingleton(
+    () => NewsCubit(
+      getMoviesNews: locator<GetMoviesNews>(),
+      getTopHeadlines: locator<GetTopHeadlines>(),
+      searchNews: locator<SearchNews>(),
+      getNewsBySource: locator<GetNewsBySource>(),
+      getNewsByDateRange: locator<GetNewsByDateRange>(),
+    ),
+  );
 
   // App State Service
   locator.registerSingleton<AppStateService>(AppStateService());
