@@ -46,8 +46,10 @@ class AppStateService {
 
 Future<void> setupLocator() async {
   // Initialize storage
-  await PreferencesHelper.init();
-  await DatabaseHelper.database; // Initialize database
+  await PreferencesHelper.init(); // SharedPreferences для темы
+  await DatabaseHelper.database; // SQLite для структурированных данных
+  // Flutter Secure Storage не требует явной инициализации,
+  // он инициализируется автоматически при первом использовании
 
   // Data Sources
   locator.registerLazySingleton<MoviesLocalDataSource>(

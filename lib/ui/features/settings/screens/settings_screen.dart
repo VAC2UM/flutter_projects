@@ -102,8 +102,6 @@ class SettingsView extends StatelessWidget {
                 _buildHeader(themeState),
                 const SizedBox(height: 32),
                 _buildThemeSection(context, themeState, state),
-                const SizedBox(height: 16),
-                _buildNotificationsSection(context, themeState, state),
               ],
             ),
           );
@@ -180,42 +178,6 @@ class SettingsView extends StatelessWidget {
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNotificationsSection(
-    BuildContext context,
-    ThemeState themeState,
-    SettingsState state,
-  ) {
-    return Card(
-      elevation: 2,
-      child: SwitchListTile(
-        title: const Text(
-          'Уведомления',
-          style: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        subtitle: Text(
-          state.notificationsEnabled
-              ? 'Уведомления включены'
-              : 'Уведомления выключены',
-          style: TextStyle(
-            color: themeState.currentTheme.colorScheme.onSurface.withOpacity(
-              0.6,
-            ),
-          ),
-        ),
-        value: state.notificationsEnabled,
-        onChanged: (value) {
-          context.read<SettingsCubit>().setNotifications(value);
-        },
-        secondary: Icon(
-          state.notificationsEnabled
-              ? Icons.notifications_active
-              : Icons.notifications_off,
-          color: themeState.currentTheme.colorScheme.primary,
-        ),
       ),
     );
   }

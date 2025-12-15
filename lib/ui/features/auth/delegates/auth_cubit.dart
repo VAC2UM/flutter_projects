@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'auth_state.dart';
 import 'package:flutter_projects/shared/di/service_locator.dart';
-import 'package:flutter_projects/shared/data/preferences_helper.dart';
+import 'package:flutter_projects/shared/data/secure_storage_helper.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthState()) {
@@ -10,9 +10,11 @@ class AuthCubit extends Cubit<AuthState> {
 
   Future<void> _checkInitialAuth() async {
     try {
-      final savedUser = await PreferencesHelper.getCurrentUser();
+      final token = await SecureStorageHelper.getAuthToken();
 
-      if (savedUser != null && savedUser.isNotEmpty) {
+      if (token != null && token.isNotEmpty) {
+        final savedUser = token;
+
         if (locator.isRegistered<AppStateService>()) {
           final appState = locator<AppStateService>();
           appState.setCurrentUser(savedUser);
@@ -38,7 +40,11 @@ class AuthCubit extends Cubit<AuthState> {
 
     Future.delayed(const Duration(milliseconds: 500), () async {
       if (login == 'admin' && password == '12345') {
-        await PreferencesHelper.setCurrentUser(login);
+        // Генерируем простой токен (в реальном приложении это будет JWT от сервера)
+        final token = 'token_${login}_${DateTime.now().millisecondsSinceEpoch}';
+        
+        // Сохраняем токен в Secure Storage
+        await SecureStorageHelper.saveAuthToken(token);
 
         if (locator.isRegistered<AppStateService>()) {
           final appState = locator<AppStateService>();
@@ -61,7 +67,8 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> logout() async {
-    await PreferencesHelper.clearCurrentUser();
+    // Удаляем токен из Secure Storage
+    await SecureStorageHelper.deleteAuthToken();
 
     if (locator.isRegistered<AppStateService>()) {
       final appState = locator<AppStateService>();

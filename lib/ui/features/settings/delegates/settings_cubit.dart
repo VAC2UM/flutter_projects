@@ -12,12 +12,9 @@ class SettingsCubit extends Cubit<SettingsState> {
 
     try {
       final isDarkMode = await PreferencesHelper.getDarkMode();
-      final notificationsEnabled =
-          await PreferencesHelper.getNotificationsEnabled();
 
       final loadedSettings = SettingsState(
         isDarkMode: isDarkMode,
-        notificationsEnabled: notificationsEnabled,
         isLoading: false,
       );
 
@@ -36,28 +33,15 @@ class SettingsCubit extends Cubit<SettingsState> {
     _saveThemePreference(newDarkMode);
   }
 
-  void toggleNotifications() {
-    final newNotificationsState = !state.notificationsEnabled;
-    emit(state.copyWith(notificationsEnabled: newNotificationsState));
-
-    _saveNotificationsPreference(newNotificationsState);
-  }
-
   void setDarkMode(bool isDarkMode) {
     emit(state.copyWith(isDarkMode: isDarkMode));
     _saveThemePreference(isDarkMode);
   }
 
-  void setNotifications(bool enabled) {
-    emit(state.copyWith(notificationsEnabled: enabled));
-    _saveNotificationsPreference(enabled);
-  }
-
   void resetToDefaults() {
-    emit(const SettingsState(isDarkMode: false, notificationsEnabled: true));
+    emit(const SettingsState(isDarkMode: false));
 
     _saveThemePreference(false);
-    _saveNotificationsPreference(true);
   }
 
   void clearError() {
@@ -69,14 +53,6 @@ class SettingsCubit extends Cubit<SettingsState> {
       await PreferencesHelper.setDarkMode(isDarkMode);
     } catch (e) {
       emit(state.copyWith(error: 'Ошибка сохранения темы: $e'));
-    }
-  }
-
-  Future<void> _saveNotificationsPreference(bool enabled) async {
-    try {
-      await PreferencesHelper.setNotificationsEnabled(enabled);
-    } catch (e) {
-      emit(state.copyWith(error: 'Ошибка сохранения настроек уведомлений: $e'));
     }
   }
 }

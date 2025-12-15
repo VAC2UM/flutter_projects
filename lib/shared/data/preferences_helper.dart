@@ -4,8 +4,6 @@ import '../../domain/models/user.dart';
 
 class PreferencesHelper {
   static const String _keyDarkMode = 'dark_mode';
-  static const String _keyNotificationsEnabled = 'notifications_enabled';
-  static const String _keyCurrentUser = 'current_user';
   static const String _keyUserProfile = 'user_profile';
 
   static SharedPreferences? _prefs;
@@ -29,26 +27,6 @@ class PreferencesHelper {
     await prefs.setBool(_keyDarkMode, isDarkMode);
   }
 
-  static Future<bool> getNotificationsEnabled() async {
-    return prefs.getBool(_keyNotificationsEnabled) ?? true;
-  }
-
-  static Future<void> setNotificationsEnabled(bool enabled) async {
-    await prefs.setBool(_keyNotificationsEnabled, enabled);
-  }
-
-  static Future<String?> getCurrentUser() async {
-    return prefs.getString(_keyCurrentUser);
-  }
-
-  static Future<void> setCurrentUser(String userId) async {
-    await prefs.setString(_keyCurrentUser, userId);
-  }
-
-  static Future<void> clearCurrentUser() async {
-    await prefs.remove(_keyCurrentUser);
-  }
-
   static Future<User?> getUserProfile() async {
     final profileJson = prefs.getString(_keyUserProfile);
     if (profileJson == null) return null;
@@ -69,6 +47,7 @@ class PreferencesHelper {
     }
   }
 
+  /// Сохранить профиль пользователя
   static Future<void> saveUserProfile(User user) async {
     final profileMap = {
       'id': user.id,
@@ -82,11 +61,12 @@ class PreferencesHelper {
     await prefs.setString(_keyUserProfile, json.encode(profileMap));
   }
 
+  /// Очистить профиль пользователя
   static Future<void> clearUserProfile() async {
     await prefs.remove(_keyUserProfile);
   }
 
-  // Clear all preferences
+  /// Очистить все настройки
   static Future<void> clearAll() async {
     await prefs.clear();
   }

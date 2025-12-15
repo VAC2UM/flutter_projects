@@ -8,7 +8,6 @@ import 'package:flutter_projects/ui/features/profile/screens/edit_profile_screen
 import 'package:flutter_projects/ui/features/profile/screens/profile_screen.dart';
 import 'package:flutter_projects/ui/features/reviews/screens/add_review_screen.dart';
 import 'package:flutter_projects/ui/features/reviews/screens/reviews_screen.dart';
-import 'package:flutter_projects/ui/features/reviews/delegates/reviews_cubit.dart';
 import 'package:flutter_projects/ui/features/profile/delegates/profile_cubit.dart';
 import 'package:flutter_projects/ui/features/settings/delegates/settings_cubit.dart';
 import 'package:flutter_projects/ui/features/settings/delegates/settings_state.dart';
